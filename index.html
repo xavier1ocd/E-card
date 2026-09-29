@@ -1,5 +1,4 @@
-
-<meta name='viewport' content='width=device-width, initial-scale=1'/><!DOCTYPE html> 
+<!DOCTYPE html> 
 <html lang="ta"> 
 <head> 
 <meta charset="UTF-8"> 
@@ -470,6 +469,58 @@ async function fetchCloudDataOnLoad() {
     } 
   } 
 } 
+
+function handleAdminAuthentication() {
+  const secretKey = document.getElementById('adminSecretPass').value.trim();
+  if (secretKey === "Carmel" || secretKey === "admin") {
+    sessionStorage.setItem('OLMC_Admin_LoggedIn', 'true');
+    document.getElementById('loginScreen').classList.add('hidden');
+    document.getElementById('adminDashboard').classList.remove('hidden');
+  } else {
+    alert("⚠️ Incorrect Master Security Passphrase!");
+  }
+}
+
+function logoutAdmin() {
+  sessionStorage.removeItem('OLMC_Admin_LoggedIn');
+  document.getElementById('adminDashboard').classList.add('hidden');
+  document.getElementById('loginScreen').classList.remove('hidden');
+  document.getElementById('adminSecretPass').value = '';
+}
+
+function handleFamilyLogin() {
+  const fUid = document.getElementById('famUid').value.trim();
+  const fPwd = document.getElementById('famPwd').value.trim();
+
+  let matchedKey = null;
+  for (const key in masterDatabaseFile) {
+    const fam = masterDatabaseFile[key];
+    if ((fam.loginId && fam.loginId.toLowerCase() === fUid.toLowerCase()) || fam.fNo === fUid) {
+      if (fam.password === fPwd) {
+        matchedKey = key;
+        break;
+      }
+    }
+  }
+
+  if (matchedKey) {
+    sessionStorage.setItem('OLMC_Family_LoggedIn', matchedKey);
+    document.getElementById('loginScreen').classList.add('hidden');
+    document.getElementById('familyView').classList.remove('hidden');
+    document.getElementById('vTitle').innerText = "Parish Card: Family #" + masterDatabaseFile[matchedKey].fNo;
+    generateVisualDisplayBox(masterDatabaseFile[matchedKey], 'vCardOutputZone');
+  } else {
+    alert("⚠️ Invalid Family ID or Password!");
+  }
+}
+
+function logoutFamily() {
+  sessionStorage.removeItem('OLMC_Family_LoggedIn');
+  document.getElementById('familyView').classList.add('hidden');
+  document.getElementById('loginScreen').classList.remove('hidden');
+  document.getElementById('famUid').value = '';
+  document.getElementById('famPwd').value = '';
+}
 
 function getCurrentGPSLocation() { 
   const statusText = document.getElementById('gpsStatus'); 
@@ -1005,32 +1056,35 @@ function editMember(index) {
   document.getElementById('mBap').value = m.bap || ''; 
   document.getElementById('mBapPlace').value = m.bapPlace || ''; 
   document.getElementById('mComm').value = m.comm || ''; 
-  document.getElementById('mCommPlace').value = m.commPlace || ''; 
+  document.getElementById('mCommPlace').value = m.commPlace || '';
   document.getElementById('mConf').value = m.conf || ''; 
   document.getElementById('mConfPlace').value = m.confPlace || ''; 
   document.getElementById('mMar').value = m.mar || ''; 
   document.getElementById('mMarPlace').value = m.marPlace || ''; 
   document.getElementById('mDeath').value = m.death || ''; 
   document.getElementById('mDeathPlace').value = m.deathPlace || ''; 
-  if (m.photo) { 
-    if(m.photo.startsWith('http')) { 
-      document.getElementById('memberPhotoUrl').value = m.photo; 
-    } 
-    temporaryMemberPhotoBase64 = m.photo; 
-    document.getElementById('memberPhotoPreview').src = m.photo; 
-    document.getElementById('memberPhotoPreview').style.display = 'block'; 
-  } else { 
-    temporaryMemberPhotoBase64 = ""; 
-    document.getElementById('memberPhotoPreview').style.display = 'none'; 
-  } 
+
+  if (m.photo) {
+    if (m.photo.startsWith('http')) {
+      document.getElementById('memberPhotoUrl').value = m.photo;
+    }
+    document.getElementById('memberPhotoPreview').src = m.photo;
+    document.getElementById('memberPhotoPreview').style.display = 'block';
+    temporaryMemberPhotoBase64 = m.photo;
+  } else {
+    document.getElementById('memberPhotoPreview').style.display = 'none';
+    temporaryMemberPhotoBase64 = "";
+  }
 } 
 
 function saveMemberToTemp() { 
   const name = document.getElementById('mName').value.trim(); 
-  if(!name) return alert("Name is required."); 
-  const photoUrl = document.getElementById('memberPhotoUrl').value.trim(); 
-  const finalPhoto = photoUrl || temporaryMemberPhotoBase64; 
-  const memberObj = { 
+  if(!name) return alert("Please enter the member's name."); 
+
+  const photoUrlInput = document.getElementById('memberPhotoUrl').value.trim(); 
+  const finalMemberPhoto = photoUrlInput || temporaryMemberPhotoBase64; 
+
+  const mData = { 
     name: name, 
     age: document.getElementById('mAge').value, 
     dob: document.getElementById('mDob').value, 
@@ -1046,88 +1100,64 @@ function saveMemberToTemp() {
     marPlace: document.getElementById('mMarPlace').value, 
     death: document.getElementById('mDeath').value, 
     deathPlace: document.getElementById('mDeathPlace').value, 
-    photo: finalPhoto 
+    photo: finalMemberPhoto 
   }; 
-  if (editingMemberIndex >= 0) { 
-    tempFamily.members[editingMemberIndex] = memberObj; 
+
+  if (editingMemberIndex > -1) { 
+    tempFamily.members[editingMemberIndex] = mData; 
   } else { 
-    tempFamily.members.push(memberObj); 
+    tempFamily.members.push(mData); 
   } 
+
   renderMembersList(); 
   document.getElementById('memberForm').classList.add('hidden'); 
 } 
 
-function renderMembersList() { 
-  document.getElementById('membersList').innerHTML = tempFamily.members.map((m, idx) => ` 
-    <div class="member-row"> 
-      <span><b>${m.name}</b> (Age: ${m.age || 'N/A'})</span> 
-      <div> 
-        <button style="width:auto; padding:4px 8px; background:#007bff; margin-right:4px;" onclick="editMember(${idx})">✏️</button> 
-        <button style="width:auto; padding:4px 8px; background:#dc3545;" onclick="deleteMember(${idx})">❌</button> 
-      </div> 
-    </div> 
-  `).join('') || '<i style="color:#7f786a;">No individuals attached yet.</i>'; 
+function removeMemberFromTemp(index) { 
+  if (confirm("Remove this member from workspace list?")) { 
+    tempFamily.members.splice(index, 1); 
+    renderMembersList(); 
+  } 
 } 
 
-function deleteMember(index) { 
-  tempFamily.members.splice(index, 1); 
-  renderMembersList(); 
+function renderMembersList() { 
+  const list = document.getElementById('membersList'); 
+  if (tempFamily.members.length === 0) { 
+    list.innerHTML = `<i style="color:#7f786a;">No individuals attached yet.</i>`; 
+    return; 
+  } 
+  list.innerHTML = tempFamily.members.map((m, idx) => ` 
+    <div class="member-row"> 
+      <div> 
+        <b>👤 ${m.name}</b> (${m.work || 'No Work Info'}) <br> 
+        <span style="font-size:0.75rem; color:#666;">Age: ${m.age || 'N/A'} | Phone: ${m.phone || 'N/A'}</span> 
+      </div> 
+      <div style="display:flex; gap:5px;"> 
+        <button style="width:auto; padding:4px 8px; font-size:0.75rem; margin:0; background:#3e517a;" onclick="editMember(${idx})">✏️ Edit</button> 
+        <button class="btn-delete" style="padding:4px 8px;" onclick="removeMemberFromTemp(${idx})">🗑️</button> 
+      </div> 
+    </div> 
+  `).join(''); 
 } 
 
 function resetForm() { 
   tempFamily = { members: [] }; 
+  temporaryMemberPhotoBase64 = ""; 
   temporaryFamilyPhotoBase64 = ""; 
+  editingMemberIndex = -1; 
+  
+  document.querySelectorAll('#adminDashboard input').forEach(el => el.value = ''); 
+  document.getElementById('famPassword').value = 'Carmel'; 
   document.getElementById('familyHeroPhotoPreview').style.display = 'none'; 
+  document.getElementById('memberPhotoPreview').style.display = 'none'; 
+  document.getElementById('memberForm').classList.add('hidden'); 
   document.getElementById('activeCardDisplayZone').innerHTML = ''; 
+  document.getElementById('searchResults').innerHTML = ''; 
+  document.getElementById('analyticsOutput').innerHTML = ''; 
+  document.getElementById('eventsOutput').innerHTML = ''; 
   document.getElementById('gpsStatus').innerText = ''; 
-  document.querySelectorAll('#adminDashboard input').forEach(el => { 
-    if(!el.id.startsWith('analytics')) el.value = ''; 
-  }); 
-  document.getElementById('famPassword').value = "Carmel"; 
   renderMembersList(); 
 } 
-
-function handleAdminAuthentication() { 
-  if(document.getElementById('adminSecretPass').value.trim() === "Carmel OCD") { 
-    sessionStorage.setItem('OLMC_Admin_LoggedIn', 'true');
-    document.getElementById('loginScreen').classList.add('hidden'); 
-    document.getElementById('adminDashboard').classList.remove('hidden'); 
-    updateParishDashboardCounters(); 
-  } else { 
-    alert("Access Denied."); 
-  } 
-} 
-
-function logoutAdmin() {
-  sessionStorage.removeItem('OLMC_Admin_LoggedIn');
-  location.reload();
-}
-
-function handleFamilyLogin() { 
-  const uid = document.getElementById('famUid').value.trim(); 
-  const pwd = document.getElementById('famPwd').value.trim(); 
-  for (const key in masterDatabaseFile) { 
-    const family = masterDatabaseFile[key]; 
-    if (family.loginId === uid && family.password === pwd) { 
-      sessionStorage.setItem('OLMC_Family_LoggedIn', key);
-      document.getElementById('loginScreen').classList.add('hidden'); 
-      document.getElementById('familyView').classList.remove('hidden'); 
-      document.getElementById('vTitle').innerText = "Parish Card: Family #" + family.fNo; 
-      generateVisualDisplayBox(family, 'vCardOutputZone'); 
-      return; 
-    } 
-  } 
-  alert("No credentials match internal app store."); 
-} 
-
-function logoutFamily() {
-  sessionStorage.removeItem('OLMC_Family_LoggedIn');
-  location.reload();
-}
-
-document.getElementById('fNo').addEventListener('keyup', function() { 
-  document.getElementById('famLoginId').value = this.value ? "MC " + this.value : ""; 
-}); 
 </script> 
 </body> 
 </html>

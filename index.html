@@ -1,1164 +1,1364 @@
-<!DOCTYPE html> 
-<html lang="ta"> 
-<head> 
-<meta charset="UTF-8"> 
-<meta name="viewport" content="width=device-width, initial-scale=1.0"> 
-<title>Our Lady of Mount Carmel Church Registry</title> 
-<style> 
-:root { 
-  --primary-velvet: #721c24; 
-  --gold-accent: #d4af37; 
-  --holy-white: #fdfbf7; 
-  --text-dark: #2d2d2d; 
-  --shadow-elegant: 0 10px 25px -5px rgba(0, 0, 0, 0.15); 
-  --excel-blue: #107c41; 
-} 
-body { 
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-  background: linear-gradient(135deg, #f5f0e6 0%, #e6dfd3 100%); 
-  margin: 0; 
-  padding: 15px; 
-  color: var(--text-dark); 
-} 
-.container { 
-  width: 95%; 
-  max-width: 1200px; 
-  margin: 20px auto; 
-  background: var(--holy-white); 
-  padding: 25px; 
-  border-radius: 20px; 
-  box-shadow: var(--shadow-elegant); 
-  border: 2px solid var(--gold-accent); 
-  box-sizing: border-box;
-} 
-#loginScreen { text-align: center; max-width: 500px; margin: 0 auto; } 
-.church-banner-fallback { 
-  background: linear-gradient(135deg, var(--primary-velvet) 0%, #4a1217 100%); 
-  color: var(--gold-accent); 
-  padding: 25px 15px; 
-  border-radius: 14px; 
-  margin-bottom: 20px; 
-  text-align: center; 
-} 
-.cross-icon { font-size: 2.2rem; display: block; margin-bottom: 5px; } 
-h1 { color: var(--gold-accent); font-size: 1.4rem; margin: 0; font-weight: 700; text-transform: uppercase; } 
-.sub-header { color: #ffffff; font-size: 0.9rem; margin: 5px 0 0 0; font-weight: 300; font-style: italic; } 
-.panel-box { 
-  background: #ffffff; 
-  padding: 20px; 
-  border-radius: 12px; 
-  margin-top: 20px; 
-  box-shadow: 0 4px 6px rgba(0,0,0,0.05); 
-  border: 1px solid #e8e2d5; 
-  border-top: 4px solid var(--primary-velvet); 
-} 
-.panel-box.member-box { border-top: 4px solid var(--gold-accent); } 
-.panel-box.analytics-box { border-top: 4px solid var(--excel-blue); background: #f4faf6; } 
-.panel-box.events-box { border-top: 4px solid #8e44ad; background: #fbf7ff; } 
-.stats-summary-grid { 
-  display: grid; 
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); 
-  gap: 15px; 
-  margin-bottom: 15px; 
-} 
-.stat-card { 
-  background: linear-gradient(135deg, #721c24 0%, #4a1217 100%); 
-  color: #ffffff; 
-  padding: 15px; 
-  border-radius: 12px; 
-  text-align: center; 
-  border: 1px solid var(--gold-accent); 
-  cursor: pointer; 
-  transition: transform 0.2s, box-shadow 0.2s; 
-} 
-.stat-card:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(114, 28, 36, 0.4); } 
-.stat-number { font-size: 1.8rem; font-weight: bold; color: var(--gold-accent); margin-top: 5px; } 
-.stat-label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px; } 
-.quick-view-panel { 
-  background: #ffffff; 
-  border: 2px solid var(--gold-accent); 
-  border-radius: 12px; 
-  padding: 15px; 
-  margin-bottom: 20px; 
-} 
-h2 { font-size: 1.1rem; margin-top: 0; color: var(--primary-velvet); display: flex; align-items: center; gap: 8px; } 
-.form-group { margin-bottom: 14px; text-align: left; } 
-.form-row { display: flex; flex-wrap: wrap; gap: 15px; }
-.form-row .form-group { flex: 1; min-width: 250px; }
-.password-wrapper { position: relative; display: flex; align-items: center; } 
-.password-wrapper input { padding-right: 40px; } 
-.toggle-password { position: absolute; right: 12px; cursor: pointer; color: #64748b; font-size: 1.1rem; user-select: none; } 
-label { display: block; font-size: 0.75rem; font-weight: 700; margin-bottom: 5px; color: #5a5449; text-transform: uppercase; } 
-input, select { 
-  width: 100%; 
-  padding: 11px; 
-  border: 1px solid #cbd5e1; 
-  border-radius: 8px; 
-  box-sizing: border-box; 
-  font-size: 0.95rem; 
-  background: #faf9f6; 
-} 
-input:focus { border-color: var(--primary-velvet); outline: none; background: #fff; } 
-input[type="file"] { padding: 5px; background: #f1ede4; font-size: 0.85rem; border: 1px dashed var(--gold-accent); } 
-button { 
-  width: 100%; 
-  padding: 13px; 
-  background: var(--primary-velvet); 
-  color: white; 
-  border: none; 
-  border-radius: 8px; 
-  font-weight: bold; 
-  font-size: 0.95rem; 
-  cursor: pointer; 
-  margin-top: 5px; 
-} 
-button:hover { background: #5c161d; } 
-.section-title { color: var(--primary-velvet); border-bottom: 2px solid #f3ebd9; padding-bottom: 4px; margin-top: 25px; font-size: 1.05rem; } 
-.member-list { background: #fdfcf7; padding: 12px; border-radius: 8px; margin-top: 10px; border: 1px solid #ebdcb9; } 
-.member-row { display: flex; align-items: center; justify-content: space-between; padding: 8px 0; border-bottom: 1px dashed #e2e8f0; font-size: 0.9rem; } 
-.img-preview { width: 100px; height: 100px; object-fit: contain; background: #2d2d2d; border-radius: 8px; border: 2px solid var(--gold-accent); margin-top: 5px; display: none; } 
-.family-img-preview { width: 100%; max-height: 250px; object-fit: contain; background: #2d2d2d; border-radius: 8px; border: 2px dashed var(--gold-accent); margin-top: 5px; display: none; } 
-.family-data-card { background: #ffffff; border: 2px solid #2d2d2d; border-radius: 12px; padding: 18px; margin-top: 20px; margin-bottom: 25px; box-shadow: 0 5px 15px rgba(0,0,0,0.06); } 
-.card-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--primary-velvet); padding-bottom: 6px; margin-bottom: 12px; } 
-.card-title { font-size: 1.1rem; font-weight: bold; color: var(--primary-velvet); margin: 0; } 
-.card-id-badge { background: #2d2d2d; color: #ffffff; padding: 3px 8px; border-radius: 5px; font-weight: bold; font-size: 0.85rem; } 
-.family-hero-photo { width: 100%; max-height: 300px; object-fit: contain; background: #2d2d2d; border-radius: 8px; border: 1px solid #cbd5e1; margin-bottom: 12px; } 
-.card-info-box { background: #fdfbf7; padding: 10px; border-radius: 6px; border: 1px solid #ebdcb9; margin-bottom: 15px; font-size: 0.9rem; } 
-.visual-member-card { background: #fdfdfd; border: 1px solid #cbd5e1; border-radius: 8px; padding: 12px; margin-bottom: 12px; display: flex; gap: 12px; align-items: flex-start; } 
-.member-avatar { width: 85px; height: 85px; object-fit: contain; background: #2d2d2d; border-radius: 6px; border: 1px solid var(--gold-accent); flex-shrink: 0; } 
-.member-details { flex-grow: 1; } 
-.member-name-heading { font-size: 1rem; font-weight: bold; color: var(--primary-velvet); margin: 0 0 4px 0; } 
-.sacramental-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 6px; margin-top: 6px; background: #f8f9fa; padding: 8px; border-radius: 4px; border: 1px solid #e2e8f0; } 
-.sacrament-item { font-size: 0.78rem; color: #475569; } 
-.analytics-result-row { background: #ffffff; border-left: 4px solid var(--excel-blue); padding: 8px 12px; border-radius: 4px; margin-bottom: 6px; border: 1px solid #e2e8f0; font-size: 0.85rem; } 
-.event-result-row { background: #ffffff; border-left: 4px solid #8e44ad; padding: 8px 12px; border-radius: 4px; margin-bottom: 6px; border: 1px solid #e2e8f0; font-size: 0.85rem; } 
-.sacrament-box-group { background: #fcfbfa; border: 1px solid #e8e2d5; border-radius: 6px; padding: 8px; margin-bottom: 8px; } 
-.btn-delete { background: #dc3545; color: white; padding: 6px 12px; border-radius: 6px; border: none; font-size: 0.8rem; font-weight: bold; cursor: pointer; } 
-.btn-delete:hover { background: #a71d2a; } 
-.hidden { display: none; } 
-</style> 
-</head> 
-<body> 
-<div class="container"> 
-  <!-- PORTAL LOGIN SCREEN --> 
-  <div id="loginScreen"> 
-    <div class="church-banner-fallback"> 
-      <span class="cross-icon">✝</span> 
-      <h1>Our Lady of Mount Carmel</h1> 
-      <p class="sub-header">Parish Registry Application</p> 
-    </div> 
-    <div class="panel-box" style="border-top-color: #3e517a; background: #f1f5f9; text-align: left; padding: 15px;"> 
-      <p style="margin: 0; font-size: 0.85rem; color: #1e293b; font-weight: bold;">💾 App Storage Status:</p> 
-      <p id="storageStatusText" style="margin: 3px 0 0 0; font-size: 0.8rem; color: #475569;">Initializing Application Memory...</p> 
-    </div> 
-    <div class="panel-box"> 
-      <h2>⛪ Clergy Administration</h2> 
-      <div class="form-group"> 
-        <label>Master Security Passphrase</label> 
-        <div class="password-wrapper"> 
-          <input type="password" id="adminSecretPass" placeholder="Enter Secure Clergy Key..."> 
-          <span class="toggle-password" onclick="togglePasswordVisibility('adminSecretPass')">👁️</span> 
-        </div> 
-      </div> 
-      <button onclick="handleAdminAuthentication()">Authenticate Access</button> 
-    </div> 
-    <div class="panel-box member-box"> 
-      <h2>👨‍👩‍👧‍👦 Parishioner Access Portal</h2> 
-      <div class="form-group"><label>Family Card ID</label><input type="text" id="famUid" placeholder="e.g. MC 107"></div> 
-      <div class="form-group"> 
-        <label>Assigned Password</label> 
-        <div class="password-wrapper"> 
-          <input type="password" id="famPwd" placeholder="e.g. Carmel"> 
-          <span class="toggle-password" onclick="togglePasswordVisibility('famPwd')">👁️</span> 
-        </div> 
-      </div> 
-      <button style="background: #3e517a;" onclick="handleFamilyLogin()">Access Family Record</button> </div> 
-  </div> 
+<!DOCTYPE html>
+<html lang="ta">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Our Lady of Mount Carmel Church Registry</title>
+    <style>
+        :root {
+            --primary-velvet: #721c24;
+            --gold-accent: #d4af37;
+            --holy-white: #fdfbf7;
+            --text-dark: #2d2d2d;
+            --shadow-elegant: 0 10px 25px -5px rgba(0, 0, 0, 0.15);
+            --excel-blue: #107c41;
+        }
 
-  <!-- MASTER MANAGEMENT HUB --> 
-  <div id="adminDashboard" class="hidden"> 
-    <div style="border-bottom: 2px solid var(--gold-accent); padding-bottom: 8px; margin-bottom: 15px;"> 
-      <h2 style="margin: 0;">⚡ Clergy Administration Hub</h2> 
-    </div> 
-    
-    <!-- REAL-TIME CLICKABLE PARISH STATISTICAL COUNTERS --> 
-    <div class="stats-summary-grid"> 
-      <div class="stat-card" onclick="toggleFamilyDirectoryView()" title="Click to view all families"> 
-        <div class="stat-label">Total Families 🖱️</div> 
-        <div id="totalFamiliesCount" class="stat-number">0</div> 
-      </div> 
-      <div class="stat-card" onclick="togglePeopleDirectoryView()" title="Click to view all registered parishioners"> 
-        <div class="stat-label">Total People 🖱️</div> 
-        <div id="totalPeopleCount" class="stat-number">0</div> 
-      </div> 
-    </div> 
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f5f0e6 0%, #e6dfd3 100%);
+            margin: 0;
+            padding: 15px;
+            color: var(--text-dark);
+        }
 
-    <!-- QUICK DISPLAY ZONE FOR CLICKED COUNTER DATA --> 
-    <div id="quickCounterDirectoryView" class="quick-view-panel hidden"> 
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;"> 
-        <h3 id="directoryPanelTitle" style="margin: 0; color: var(--primary-velvet); font-size: 1rem;">📋 Directory List</h3> 
-        <button style="width: auto; padding: 4px 10px; margin: 0; background: #64748b;" onclick="closeCounterDirectoryView()">✖ Close</button> 
-      </div> 
-      <div id="directoryContentList" style="max-height: 300px; overflow-y: auto;"></div> 
-    </div> 
+        .container {
+            width: 95%;
+            max-width: 1200px;
+            margin: 20px auto;
+            background: var(--holy-white);
+            padding: 25px;
+            border-radius: 20px;
+            box-shadow: var(--shadow-elegant);
+            border: 2px solid var(--gold-accent);
+            box-sizing: border-box;
+        }
 
-    <!-- REMEMBRANCE & EVENTS DASHBOARD -->
-    <div class="panel-box events-box">
-      <h2 style="color: #8e44ad; margin-bottom: 8px;">🎉 REMEMBRANCE & EVENTS TRACKER</h2>
-      <p style="font-size: 0.8rem; color: #4a235a; margin: 0 0 12px 0;">மாதம் அல்லது தேதி வாரியாகப் பிறந்தநாள், திருமண நாள் மற்றும் நினைவஞ்சலி நாட்களைக் கண்டறியலாம்.</p>
-      <div class="form-row">
-        <div class="form-group" style="margin:0;">
-          <label style="color: #8e44ad;">Select Month (மாதம்)</label>
-          <select id="eventMonthFilter">
-            <option value="">-- All Months --</option>
-            <option value="0">January (ஜனவரி)</option>
-            <option value="1">February (பிப்ரவரி)</option>
-            <option value="2">March (மார்ச்)</option>
-            <option value="3">April (ஏப்ரல்)</option>
-            <option value="4">May (மே)</option>
-            <option value="5">June (ஜூன்)</option>
-            <option value="6">July (ஜூலை)</option>
-            <option value="7">August (ஆகஸ்ட்)</option>
-            <option value="8">September (செப்டம்பர்)</option>
-            <option value="9">October (அக்டோபர்)</option>
-            <option value="10">November (நவம்பர்)</option>
-            <option value="11">December (டிசம்பர்)</option>
-          </select>
+        .church-banner-fallback {
+            background: linear-gradient(135deg, var(--primary-velvet) 0%, #4a1217 100%);
+            color: var(--gold-accent);
+            padding: 25px 15px;
+            border-radius: 14px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .cross-icon {
+            font-size: 2.2rem;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        h1 {
+            color: var(--gold-accent);
+            font-size: 1.4rem;
+            margin: 0;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .sub-header {
+            color: #ffffff;
+            font-size: 0.9rem;
+            margin: 5px 0 0 0;
+            font-weight: 300;
+            font-style: italic;
+        }
+
+        .panel-box {
+            background: #ffffff;
+            padding: 20px;
+            border-radius: 12px;
+            margin-top: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            border: 1px solid #e8e2d5;
+            border-top: 4px solid var(--primary-velvet);
+        }
+
+        .panel-box.analytics-box {
+            border-top: 4px solid var(--excel-blue);
+            background: #f4faf6;
+        }
+
+        .panel-box.events-box {
+            border-top: 4px solid #8e44ad;
+            background: #fbf7ff;
+        }
+
+        .stats-summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #721c24 0%, #4a1217 100%);
+            color: #ffffff;
+            padding: 15px;
+            border-radius: 12px;
+            text-align: center;
+            border: 1px solid var(--gold-accent);
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(114, 28, 36, 0.4);
+        }
+
+        .stat-number {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: var(--gold-accent);
+            margin-top: 5px;
+        }
+
+        .stat-label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .quick-view-panel {
+            background: #ffffff;
+            border: 2px solid var(--gold-accent);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+
+        h2 {
+            font-size: 1.1rem;
+            margin-top: 0;
+            color: var(--primary-velvet);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .form-group {
+            margin-bottom: 14px;
+            text-align: left;
+        }
+
+        .form-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .form-row .form-group {
+            flex: 1;
+            min-width: 250px;
+        }
+
+        label {
+            display: block;
+            font-size: 0.75rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+            color: #5a5449;
+            text-transform: uppercase;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 11px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            box-sizing: border-box;
+            font-size: 0.95rem;
+            background: #faf9f6;
+        }
+
+        input:focus {
+            border-color: var(--primary-velvet);
+            outline: none;
+            background: #fff;
+        }
+
+        input[type="file"] {
+            padding: 5px;
+            background: #f1ede4;
+            font-size: 0.85rem;
+            border: 1px dashed var(--gold-accent);
+        }
+
+        button {
+            width: 100%;
+            padding: 13px;
+            background: var(--primary-velvet);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 0.95rem;
+            cursor: pointer;
+            margin-top: 5px;
+        }
+
+        button:hover {
+            background: #5c161d;
+        }
+
+        .section-title {
+            color: var(--primary-velvet);
+            border-bottom: 2px solid #f3ebd9;
+            padding-bottom: 4px;
+            margin-top: 25px;
+            font-size: 1.05rem;
+        }
+
+        .member-list {
+            background: #fdfcf7;
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 10px;
+            border: 1px solid #ebdcb9;
+        }
+
+        .member-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+
+        .img-preview {
+            width: 100px;
+            height: 100px;
+            object-fit: contain;
+            background: #2d2d2d;
+            border-radius: 8px;
+            border: 2px solid var(--gold-accent);
+            margin-top: 5px;
+            display: none;
+        }
+
+        .family-img-preview {
+            width: 100%;
+            max-height: 250px;
+            object-fit: contain;
+            background: #2d2d2d;
+            border-radius: 8px;
+            border: 2px dashed var(--gold-accent);
+            margin-top: 5px;
+            display: none;
+        }
+
+        .family-data-card {
+            background: #ffffff;
+            border: 2px solid #2d2d2d;
+            border-radius: 12px;
+            padding: 18px;
+            margin-top: 20px;
+            margin-bottom: 25px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.06);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid var(--primary-velvet);
+            padding-bottom: 6px;
+            margin-bottom: 12px;
+        }
+
+        .card-title {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: var(--primary-velvet);
+            margin: 0;
+        }
+
+        .card-id-badge {
+            background: #2d2d2d;
+            color: #ffffff;
+            padding: 3px 8px;
+            border-radius: 5px;
+            font-weight: bold;
+            font-size: 0.85rem;
+        }
+
+        .family-hero-photo {
+            width: 100%;
+            max-height: 300px;
+            object-fit: contain;
+            background: #2d2d2d;
+            border-radius: 8px;
+            border: 1px solid #cbd5e1;
+            margin-bottom: 12px;
+        }
+
+        .card-info-box {
+            background: #fdfbf7;
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid #ebdcb9;
+            margin-bottom: 15px;
+            font-size: 0.9rem;
+        }
+
+        .visual-member-card {
+            background: #fdfdfd;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 12px;
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+        }
+
+        .member-avatar {
+            width: 85px;
+            height: 85px;
+            object-fit: contain;
+            background: #2d2d2d;
+            border-radius: 6px;
+            border: 1px solid var(--gold-accent);
+            flex-shrink: 0;
+        }
+
+        .member-details {
+            flex-grow: 1;
+        }
+
+        .member-name-heading {
+            font-size: 1rem;
+            font-weight: bold;
+            color: var(--primary-velvet);
+            margin: 0 0 4px 0;
+        }
+
+        .sacramental-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 6px;
+            margin-top: 6px;
+            background: #f8f9fa;
+            padding: 8px;
+            border-radius: 4px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .sacrament-item {
+            font-size: 0.78rem;
+            color: #475569;
+        }
+
+        .analytics-result-row {
+            background: #ffffff;
+            border-left: 4px solid var(--excel-blue);
+            padding: 8px 12px;
+            border-radius: 4px;
+            margin-bottom: 6px;
+            border: 1px solid #e2e8f0;
+            font-size: 0.85rem;
+        }
+
+        .event-result-row {
+            background: #ffffff;
+            border-left: 4px solid #8e44ad;
+            padding: 8px 12px;
+            border-radius: 4px;
+            margin-bottom: 6px;
+            border: 1px solid #e2e8f0;
+            font-size: 0.85rem;
+        }
+
+        .sacrament-box-group {
+            background: #fcfbfa;
+            border: 1px solid #e8e2d5;
+            border-radius: 6px;
+            padding: 8px;
+            margin-bottom: 8px;
+        }
+
+        .btn-delete {
+            background: #dc3545;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 6px;
+            border: none;
+            font-size: 0.8rem;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .btn-delete:hover {
+            background: #a71d2a;
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        
+        <!-- PARISH HEADER BANNER -->
+        <div class="church-banner-fallback">
+            <span class="cross-icon">✝</span>
+            <h1>Our Lady of Mount Carmel</h1>
+            <p class="sub-header">Parish Registry Application</p>
         </div>
-        <div class="form-group" style="margin:0;">
-          <label style="color: #8e44ad;">Event Type (வகை)</label>
-          <select id="eventTypeFilter">
-            <option value="ALL">All Events (அனைத்தும்)</option>
-            <option value="BIRTHDAY">🎂 Birthdays (பிறந்தநாள்)</option>
-            <option value="WEDDING">💍 Marriage Anniv. (திருமண நாள்)</option>
-            <option value="DEATH">✝ Demise Days (நினைவு நாள்)</option>
-          </select>
+
+        <!-- APP STORAGE STATUS -->
+        <div class="panel-box" style="border-top-color: #3e517a; background: #f1f5f9; text-align: left; padding: 15px; margin-top: 0;">
+            <p style="margin: 0; font-size: 0.85rem; color: #1e293b; font-weight: bold;">💾 App Storage Status:</p>
+            <p id="storageStatusText" style="margin: 3px 0 0 0; font-size: 0.8rem; color: #475569;">Initializing Application Memory...</p>
         </div>
-      </div>
-      <div style="display: flex; gap: 8px; margin-top: 10px; margin-bottom: 10px;">
-        <button style="background: #8e44ad; font-weight: bold;" onclick="filterParishEvents()">🔍 Filter Events</button>
-        <button style="background: #6c5ce7; font-weight: bold; width: auto; padding: 0 12px; white-space: nowrap;" onclick="filterTodayEvents()">⭐ Today's Events</button>
-      </div>
-      <div id="eventsOutput" style="max-height: 250px; overflow-y: auto; margin-top: 5px;"></div>
+
+        <!-- MASTER MANAGEMENT HUB (DIRECT ACCESS) -->
+        <div id="adminDashboard">
+            
+            <!-- REAL-TIME CLICKABLE PARISH STATISTICAL COUNTERS -->
+            <div class="stats-summary-grid" style="margin-top: 20px;">
+                <div class="stat-card" onclick="toggleFamilyDirectoryView()" title="Click to view all families">
+                    <div class="stat-label">Total Families 🖱️</div>
+                    <div id="totalFamiliesCount" class="stat-number">0</div>
+                </div>
+                <div class="stat-card" onclick="togglePeopleDirectoryView()" title="Click to view all registered parishioners">
+                    <div class="stat-label">Total People 🖱️</div>
+                    <div id="totalPeopleCount" class="stat-number">0</div>
+                </div>
+            </div>
+
+            <!-- QUICK DISPLAY ZONE FOR CLICKED COUNTER DATA -->
+            <div id="quickCounterDirectoryView" class="quick-view-panel hidden">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                    <h3 id="directoryPanelTitle" style="margin: 0; color: var(--primary-velvet); font-size: 1rem;">📋 Directory List</h3>
+                    <button style="width: auto; padding: 4px 10px; margin: 0; background: #64748b;" onclick="closeCounterDirectoryView()">✖ Close</button>
+                </div>
+                <div id="directoryContentList" style="max-height: 300px; overflow-y: auto;"></div>
+            </div>
+
+            <!-- REMEMBRANCE & EVENTS DASHBOARD -->
+            <div class="panel-box events-box">
+                <h2 style="color: #8e44ad; margin-bottom: 8px;">🎉 REMEMBRANCE & EVENTS TRACKER</h2>
+                <p style="font-size: 0.8rem; color: #4a235a; margin: 0 0 12px 0;">மாதம் அல்லது தேதி வாரியாகப் பிறந்தநாள், திருமண நாள் மற்றும் நினைவஞ்சலி நாட்களைக் கண்டறியலாம்.</p>
+                <div class="form-row">
+                    <div class="form-group" style="margin:0;">
+                        <label style="color: #8e44ad;">Select Month (மாதம்)</label>
+                        <select id="eventMonthFilter">
+                            <option value="">-- All Months --</option>
+                            <option value="0">January (ஜனவரி)</option>
+                            <option value="1">February (பிப்ரவரி)</option>
+                            <option value="2">March (மார்ச்)</option>
+                            <option value="3">April (ஏப்ரல்)</option>
+                            <option value="4">May (மே)</option>
+                            <option value="5">June (ஜூன்)</option>
+                            <option value="6">July (ஜூலை)</option>
+                            <option value="7">August (ஆகஸ்ட்)</option>
+                            <option value="8">September (செப்டம்பர்)</option>
+                            <option value="9">October (அக்டோபர்)</option>
+                            <option value="10">November (நவம்பர்)</option>
+                            <option value="11">December (டிசம்பர்)</option>
+                        </select>
+                    </div>
+                    <div class="form-group" style="margin:0;">
+                        <label style="color: #8e44ad;">Event Type (வகை)</label>
+                        <select id="eventTypeFilter">
+                            <option value="ALL">All Events (அனைத்தும்)</option>
+                            <option value="BIRTHDAY">🎂 Birthdays (பிறந்தநாள்)</option>
+                            <option value="WEDDING">💍 Marriage Anniv. (திருமண நாள்)</option>
+                            <option value="DEATH">✝ Demise Days (நினைவு நாள்)</option>
+                        </select>
+                    </div>
+                </div>
+                <div style="display: flex; gap: 8px; margin-top: 10px; margin-bottom: 10px;">
+                    <button style="background: #8e44ad; font-weight: bold;" onclick="filterParishEvents()">🔍 Filter Events</button>
+                    <button style="background: #6c5ce7; font-weight: bold; width: auto; padding: 0 12px; white-space: nowrap;" onclick="filterTodayEvents()">⭐ Today's Events</button>
+                </div>
+                <div id="eventsOutput" style="max-height: 250px; overflow-y: auto; margin-top: 5px;"></div>
+            </div>
+
+            <!-- EXCEL-STYLE DEEP DATA ANALYTICS SCREENER -->
+            <div class="panel-box analytics-box">
+                <h2 style="color: var(--excel-blue); margin-bottom: 8px;">📊 Excel Analytics Screener</h2>
+                <p style="font-size: 0.8rem; color: #3e4c42; margin: 0 0 12px 0;">Scrutinize and filter church members globally by age criteria and Anbiyam unit allocations.</p>
+                <div class="form-row">
+                    <div class="form-group" style="margin:0;">
+                        <label style="color: var(--excel-blue);">Min Age</label>
+                        <input type="number" id="analyticsMinAge" placeholder="Min (e.g. 12)">
+                    </div>
+                    <div class="form-group" style="margin:0;">
+                        <label style="color: var(--excel-blue);">Max Age</label>
+                        <input type="number" id="analyticsMaxAge" placeholder="Max (e.g. 30)">
+                    </div>
+                </div>
+                <div class="form-group" style="margin-top: 10px;">
+                    <label style="color: var(--excel-blue);">Filter by Anbiyam Unit (NBM)</label>
+                    <input type="text" id="analyticsAnbiyam" placeholder="e.g. Saint Xavier">
+                </div>
+                <button style="background: var(--excel-blue); font-weight: bold; margin-bottom: 10px;" onclick="executeExcelScreener()">Run Matrix Categorization</button>
+                <div id="analyticsOutput" style="max-height: 250px; overflow-y: auto; margin-top: 5px;"></div>
+            </div>
+
+            <!-- SEARCH SYSTEM -->
+            <div class="panel-box" style="background: #fffcf0; border-top-color: var(--gold-accent);">
+                <label style="color: var(--primary-velvet); font-weight: bold;">🔎 Master Directory Search</label>
+                <div style="display: flex; gap: 8px; margin-top: 5px;">
+                    <input type="text" id="adminSearchInput" placeholder="Search by names or family IDs...">
+                    <button style="width: auto; padding: 0 15px; background: #3e517a;" onclick="executeMasterSearch()">🔍 Search</button>
+                </div>
+                <div id="searchResults"></div>
+            </div>
+
+            <!-- DYNAMIC SINGLE CARD VIEWER DISPLAY BOX -->
+            <div id="activeCardDisplayZone"></div>
+
+            <!-- 1. ONLY FAMILY DETAILS SECTION -->
+            <h3 class="section-title">🏡 Family Basic Details</h3>
+            <div class="form-group">
+                <label>🖼️ Family Photo (Upload File or Paste Image URL)</label>
+                <input type="file" id="familyHeroPhotoInput" accept="image/*" onchange="previewFamilyImage(this)">
+                <input type="text" id="familyHeroPhotoUrl" placeholder="Or paste image web link..." style="margin-top: 5px;" onchange="previewFamilyUrlImage(this.value)">
+                <img id="familyHeroPhotoPreview" class="family-img-preview" alt="Family Portrait Preview">
+            </div>
+
+            <div class="form-row">
+                <div class="form-group"><label>Family Card Number</label><input type="text" id="fNo" placeholder="e.g. 107"></div>
+                <div class="form-group"><label>Anbiyam Unit Name (NBM)</label><input type="text" id="anbiyamName" placeholder="e.g. Saint Xavier"></div>
+            </div>
+
+            <div class="form-group"><label>Address</label><input type="text" id="address" placeholder="Enter Family Address"></div>
+
+            <!-- AUTOMATIC GPS LOCATION CAPTURE FIELD -->
+            <div class="form-group">
+                <label>📍 House Location (GPS Automatic Capture)</label>
+                <div style="display: flex; gap: 8px;">
+                    <input type="text" id="houseLocationUrl" placeholder="Click button to auto-capture GPS location..." readonly>
+                    <button type="button" style="width: auto; padding: 0 12px; background: #28a745; white-space: nowrap;" onclick="getCurrentGPSLocation()">📍 Get GPS</button>
+                </div>
+                <span id="gpsStatus" style="font-size: 0.75rem; color: #666; margin-top: 4px; display: block;"></span>
+            </div>
+
+            <!-- 2. SEPARATE INDIVIDUAL MEMBERS SECTION -->
+            <h3 class="section-title">👥 Individual Members Details</h3>
+            <div id="membersList" class="member-list"><i style="color:#7f786a;">No individuals attached yet.</i></div>
+            <button style="background: #51596b; margin-top: 10px;" onclick="openMemberFormForNew()">➕ Add New Member</button>
+
+            <!-- COMPREHENSIVE SACRAMENTAL MEMBER FORM -->
+            <div id="memberForm" class="hidden" style="margin-top:15px; border: 2px solid var(--gold-accent); padding: 15px; border-radius: 10px; background: #fffdf9;">
+                <h4 id="memberFormTitle" style="margin: 0 0 12px 0; color: var(--primary-velvet); font-weight: bold;">👤 Individual Member Profile</h4>
+                
+                <div class="form-group">
+                    <label>🖼️ Profile Photo (Upload or Paste Link)</label>
+                    <input type="file" id="memberPhotoInput" accept="image/*" onchange="previewImage(this, 'memberPhotoPreview')">
+                    <input type="text" id="memberPhotoUrl" placeholder="Or paste photo web link..." style="margin-top: 5px;" onchange="previewUrlImage(this.value, 'memberPhotoPreview')">
+                    <img id="memberPhotoPreview" class="img-preview" alt="Preview">
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group"><label>Full Sacramental Name</label><input type="text" id="mName"></div>
+                    <div class="form-group"><label>Age</label><input type="number" id="mAge"></div>
+                    <div class="form-group"><label>Date of Birth (Birthday)</label><input type="date" id="mDob"></div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group"><label>Profession / Vocation</label><input type="text" id="mWork"></div>
+                    <div class="form-group"><label>Mobile Phone Connection</label><input type="tel" id="mPhone"></div>
+                </div>
+
+                <p style="font-size: 0.75rem; font-weight: bold; color: var(--primary-velvet); margin: 12px 0 6px 0; border-bottom: 1px solid #ebdcb9;">🕊️ SACRAMENTAL MILESTONES & LOCATIONS</p>
+
+                <!-- BAPTISM -->
+                <div class="sacrament-box-group">
+                    <div class="form-row">
+                        <div class="form-group" style="margin-bottom:5px;"><label>Holy Baptism Date</label><input type="date" id="mBap"></div>
+                        <div class="form-group" style="margin:0;"><label>Which Church / Place (Baptism)</label><input type="text" id="mBapPlace" placeholder="e.g. St. Joseph Church, Trichy"></div>
+                    </div>
+                </div>
+
+                <!-- COMMUNION -->
+                <div class="sacrament-box-group">
+                    <div class="form-row">
+                        <div class="form-group" style="margin-bottom:5px;"><label>First Holy Communion Date</label><input type="date" id="mComm"></div>
+                        <div class="form-group" style="margin:0;"><label>Which Church / Place (Communion)</label><input type="text" id="mCommPlace" placeholder="e.g. Mount Carmel Church, Chennai"></div>
+                    </div>
+                </div>
+
+                <!-- CONFIRMATION -->
+                <div class="sacrament-box-group">
+                    <div class="form-row">
+                        <div class="form-group" style="margin-bottom:5px;"><label>Sacrament of Confirmation Date</label><input type="date" id="mConf"></div>
+                        <div class="form-group" style="margin:0;"><label>Which Church / Place (Confirmation)</label><input type="text" id="mConfPlace" placeholder="e.g. Cathedral Church, Madurai"></div>
+                    </div>
+                </div>
+
+                <!-- MARRIAGE -->
+                <div class="sacrament-box-group">
+                    <div class="form-row">
+                        <div class="form-group" style="margin-bottom:5px;"><label>Holy Matrimony (Marriage) Date</label><input type="date" id="mMar"></div>
+                        <div class="form-group" style="margin:0;"><label>Which Church / Place (Marriage)</label><input type="text" id="mMarPlace" placeholder="e.g. Sacred Heart Church, Kovai"></div>
+                    </div>
+                </div>
+
+                <!-- DEMISE -->
+                <div class="sacrament-box-group">
+                    <div class="form-row">
+                        <div class="form-group" style="margin-bottom:5px;"><label>Date of Demise (If applicable)</label><input type="date" id="mDeath"></div>
+                        <div class="form-group" style="margin:0;"><label>Which Place / Cemetery</label><input type="text" id="mDeathPlace" placeholder="e.g. Parish Cemetery, Vandavasi"></div>
+                    </div>
+                </div>
+
+                <button onclick="saveMemberToTemp()">Save Member Profile</button>
+                <button style="background:#64748b; margin-top:5px;" onclick="document.getElementById('memberForm').classList.add('hidden')">Cancel</button>
+            </div>
+
+            <hr style="margin-top: 25px;">
+
+            <!-- MAIN SAVE & AUTO CLOUD SYNC BUTTON -->
+            <button style="background: #28a745; padding: 15px; font-size: 1.05rem;" onclick="saveFamilyToMemoryBundle()">💾 Save Record Directly In App</button>
+
+            <!-- BACKUP FILE EXPORT & IMPORT SECTION FOR PC TRANSFER -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px;">
+                <button style="background: #e67e22; padding: 12px; margin: 0;" onclick="exportOfflineDataFile()">📤 Export Backup File</button>
+                <button style="background: #8e44ad; padding: 12px; margin: 0;" onclick="document.getElementById('importFileInput').click()">📥 Import Backup File</button>
+                <input type="file" id="importFileInput" class="hidden" accept=".json" onchange="importOfflineDataFile(event)">
+            </div>
+
+            <button style="background: #adb5bd; margin-top: 8px; color: #333;" onclick="resetForm()">🔄 Clear Entry Workspace</button>
+        </div>
     </div>
 
-    <!-- EXCEL-STYLE DEEP DATA ANALYTICS SCREENER --> 
-    <div class="panel-box analytics-box"> 
-      <h2 style="color: var(--excel-blue); margin-bottom: 8px;">📊 Excel Analytics Screener</h2> 
-      <p style="font-size: 0.8rem; color: #3e4c42; margin: 0 0 12px 0;">Scrutinize and filter church members globally by age criteria and Anbiyam unit allocations.</p> 
-      <div class="form-row"> 
-        <div class="form-group" style="margin:0;"> 
-          <label style="color: var(--excel-blue);">Min Age</label> 
-          <input type="number" id="analyticsMinAge" placeholder="Min (e.g. 12)"> 
-        </div> 
-        <div class="form-group" style="margin:0;"> 
-          <label style="color: var(--excel-blue);">Max Age</label> 
-          <input type="number" id="analyticsMaxAge" placeholder="Max (e.g. 30)"> 
-        </div> 
-      </div> 
-      <div class="form-group" style="margin-top: 10px;"> 
-        <label style="color: var(--excel-blue);">Filter by Anbiyam Unit (NBM)</label> 
-        <input type="text" id="analyticsAnbiyam" placeholder="e.g. Saint Xavier"> 
-      </div> 
-      <button style="background: var(--excel-blue); font-weight: bold; margin-bottom: 10px;" onclick="executeExcelScreener()">Run Matrix Categorization</button> 
-      <div id="analyticsOutput" style="max-height: 250px; overflow-y: auto; margin-top: 5px;"></div> 
-    </div> 
+    <script>
+        const CLOUD_API_GATEWAY_URL = "https://script.google.com/macros/s/AKfycbzjMGz7XFNRF3DXNLQNo_bRaeCHrCOs91rqw4GMAenA1ToO-V_7A11SioTPAEvYc6RqRA/exec";
+        let masterDatabaseFile = {};
+        let tempFamily = { members: [] };
+        let temporaryMemberPhotoBase64 = "";
+        let temporaryFamilyPhotoBase64 = "";
+        let editingMemberIndex = -1;
 
-    <!-- SEARCH SYSTEM --> 
-    <div class="panel-box" style="background: #fffcf0; border-top-color: var(--gold-accent);"> 
-      <label style="color: var(--primary-velvet); font-weight: bold;">🔎 Master Directory Search</label> 
-      <div style="display: flex; gap: 8px; margin-top: 5px;"> 
-        <input type="text" id="adminSearchInput" placeholder="Search by names or family IDs..."> 
-        <button style="width: auto; padding: 0 15px; background: #3e517a;" onclick="executeMasterSearch()">🔍 Search</button> 
-      </div> 
-      <div id="searchResults"></div> 
-    </div> 
+        window.addEventListener('DOMContentLoaded', () => {
+            const localData = localStorage.getItem('OLMC_Parish_Local_Database');
+            if (localData) {
+                try {
+                    masterDatabaseFile = JSON.parse(localData);
+                    updateParishDashboardCounters();
+                } catch (e) {
+                    masterDatabaseFile = {};
+                }
+            }
+            fetchCloudDataOnLoad();
+        });
 
-    <!-- DYNAMIC SINGLE CARD VIEWER DISPLAY BOX --> 
-    <div id="activeCardDisplayZone"></div> 
+        async function fetchCloudDataOnLoad() {
+            const statusText = document.getElementById('storageStatusText');
+            if (statusText) {
+                statusText.innerText = "⏳ Cloud-லிருந்து தரவுகள் புதுப்பிக்கப்படுகின்றன...";
+                statusText.style.color = "#d97706";
+            }
 
-    <!-- 1. ONLY FAMILY DETAILS SECTION --> 
-    <h3 class="section-title">🏡 Family Basic Details</h3> 
-    <div class="form-group"> 
-      <label>🖼️ Family Photo (Upload File or Paste Image URL)</label> 
-      <input type="file" id="familyHeroPhotoInput" accept="image/*" onchange="previewFamilyImage(this)"> 
-      <input type="text" id="familyHeroPhotoUrl" placeholder="Or paste image web link..." style="margin-top: 5px;" onchange="previewFamilyUrlImage(this.value)"> 
-      <img id="familyHeroPhotoPreview" class="family-img-preview" alt="Family Portrait Preview"> 
-    </div> 
-    
-    <div class="form-row">
-      <div class="form-group"><label>Family Card Number</label><input type="text" id="fNo" placeholder="e.g. 107"></div> 
-      <div class="form-group"><label>Family User Login ID</label><input type="text" id="famLoginId" placeholder="e.g. MC 107"></div> 
-      <div class="form-group"> 
-        <label>Family Login Password</label> 
-        <div class="password-wrapper"> 
-          <input type="password" id="famPassword" value="Carmel"> 
-          <span class="toggle-password" onclick="togglePasswordVisibility('famPassword')">👁️</span> 
-        </div> 
-      </div> 
-    </div>
-
-    <div class="form-row">
-      <div class="form-group"><label>Anbiyam Unit Name (NBM)</label><input type="text" id="anbiyamName" placeholder="e.g. Saint Xavier"></div> 
-      <div class="form-group"><label>Address</label><input type="text" id="address" placeholder="Enter Family Address"></div> 
-    </div>
-
-    <!-- AUTOMATIC GPS LOCATION CAPTURE FIELD --> 
-    <div class="form-group"> 
-      <label>📍 House Location (GPS Automatic Capture)</label> 
-      <div style="display: flex; gap: 8px;"> 
-        <input type="text" id="houseLocationUrl" placeholder="Click button to auto-capture GPS location..." readonly> 
-        <button type="button" style="width: auto; padding: 0 12px; background: #28a745; white-space: nowrap;" onclick="getCurrentGPSLocation()">📍 Get GPS</button> 
-      </div> 
-      <span id="gpsStatus" style="font-size: 0.75rem; color: #666; margin-top: 4px; display: block;"></span> 
-    </div> 
-
-    <!-- 2. SEPARATE INDIVIDUAL MEMBERS SECTION --> 
-    <h3 class="section-title">👥 Individual Members Details</h3> 
-    <div id="membersList" class="member-list"><i style="color:#7f786a;">No individuals attached yet.</i></div> 
-    <button style="background: #51596b; margin-top: 10px;" onclick="openMemberFormForNew()">➕ Add New Member</button> 
-
-    <!-- COMPREHENSIVE SACRAMENTAL MEMBER FORM --> 
-    <div id="memberForm" class="hidden" style="margin-top:15px; border: 2px solid var(--gold-accent); padding: 15px; border-radius: 10px; background: #fffdf9;"> 
-      <h4 id="memberFormTitle" style="margin: 0 0 12px 0; color: var(--primary-velvet); font-weight: bold;">👤 Individual Member Profile</h4> 
-      <div class="form-group"> 
-        <label>🖼️ Profile Photo (Upload or Paste Link)</label> 
-        <input type="file" id="memberPhotoInput" accept="image/*" onchange="previewImage(this, 'memberPhotoPreview')"> 
-        <input type="text" id="memberPhotoUrl" placeholder="Or paste photo web link..." style="margin-top: 5px;" onchange="previewUrlImage(this.value, 'memberPhotoPreview')"> 
-        <img id="memberPhotoPreview" class="img-preview" alt="Preview"> 
-      </div> 
-      <div class="form-row">
-        <div class="form-group"><label>Full Sacramental Name</label><input type="text" id="mName"></div> 
-        <div class="form-group"><label>Age</label><input type="number" id="mAge"></div> 
-        <div class="form-group"><label>Date of Birth (Birthday)</label><input type="date" id="mDob"></div> 
-      </div>
-      <div class="form-row">
-        <div class="form-group"><label>Profession / Vocation</label><input type="text" id="mWork"></div> 
-        <div class="form-group"><label>Mobile Phone Connection</label><input type="tel" id="mPhone"></div> 
-      </div>
-      <p style="font-size: 0.75rem; font-weight: bold; color: var(--primary-velvet); margin: 12px 0 6px 0; border-bottom: 1px solid #ebdcb9;">🕊️ SACRAMENTAL MILESTONES & LOCATIONS</p> 
-      
-      <!-- BAPTISM --> 
-      <div class="sacrament-box-group"> 
-        <div class="form-row">
-          <div class="form-group" style="margin-bottom:5px;"><label>Holy Baptism Date</label><input type="date" id="mBap"></div> 
-          <div class="form-group" style="margin:0;"><label>Which Church / Place (Baptism)</label><input type="text" id="mBapPlace" placeholder="e.g. St. Joseph Church, Trichy"></div> 
-        </div>
-      </div> 
-      <!-- COMMUNION --> 
-      <div class="sacrament-box-group"> 
-        <div class="form-row">
-          <div class="form-group" style="margin-bottom:5px;"><label>First Holy Communion Date</label><input type="date" id="mComm"></div> 
-          <div class="form-group" style="margin:0;"><label>Which Church / Place (Communion)</label><input type="text" id="mCommPlace" placeholder="e.g. Mount Carmel Church, Chennai"></div> 
-        </div>
-      </div> 
-      <!-- CONFIRMATION --> 
-      <div class="sacrament-box-group"> 
-        <div class="form-row">
-          <div class="form-group" style="margin-bottom:5px;"><label>Sacrament of Confirmation Date</label><input type="date" id="mConf"></div> 
-          <div class="form-group" style="margin:0;"><label>Which Church / Place (Confirmation)</label><input type="text" id="mConfPlace" placeholder="e.g. Cathedral Church, Madurai"></div> 
-        </div>
-      </div> 
-      <!-- MARRIAGE --> 
-      <div class="sacrament-box-group"> 
-        <div class="form-row">
-          <div class="form-group" style="margin-bottom:5px;"><label>Holy Matrimony (Marriage) Date</label><input type="date" id="mMar"></div> 
-          <div class="form-group" style="margin:0;"><label>Which Church / Place (Marriage)</label><input type="text" id="mMarPlace" placeholder="e.g. Sacred Heart Church, Kovai"></div> 
-        </div>
-      </div> 
-      <!-- DEMISE --> 
-      <div class="sacrament-box-group"> 
-        <div class="form-row">
-          <div class="form-group" style="margin-bottom:5px;"><label>Date of Demise (If applicable)</label><input type="date" id="mDeath"></div> 
-          <div class="form-group" style="margin:0;"><label>Which Place / Cemetery</label><input type="text" id="mDeathPlace" placeholder="e.g. Parish Cemetery, Vandavasi"></div> 
-        </div>
-      </div> 
-      <button onclick="saveMemberToTemp()">Save Member Profile</button> 
-      <button style="background:#64748b; margin-top:5px;" onclick="document.getElementById('memberForm').classList.add('hidden')">Cancel</button> 
-    </div> 
-
-    <hr style="margin-top: 25px;"> 
-    <!-- MAIN SAVE & AUTO CLOUD SYNC BUTTON --> 
-    <button style="background: #28a745; padding: 15px; font-size: 1.05rem;" onclick="saveFamilyToMemoryBundle()">💾 Save Record Directly In App</button> 
-    
-    <!-- BACKUP FILE EXPORT & IMPORT SECTION FOR PC TRANSFER --> 
-    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px;"> 
-      <button style="background: #e67e22; padding: 12px; margin: 0;" onclick="exportOfflineDataFile()">📤 Export Backup File</button> 
-      <button style="background: #8e44ad; padding: 12px; margin: 0;" onclick="document.getElementById('importFileInput').click()">📥 Import Backup File</button> 
-      <input type="file" id="importFileInput" class="hidden" accept=".json" onchange="importOfflineDataFile(event)"> 
-    </div> 
-    <button style="background: #adb5bd; margin-top: 8px; color: #333;" onclick="resetForm()">🔄 Clear Entry Workspace</button> 
-    <button style="background: #2d2d2d; margin-top: 8px;" onclick="logoutAdmin()">🚪 Secure Exit Dashboard</button> 
-  </div> 
-
-  <!-- PARISHIONER MEMBER PORTAL DISPLAY --> 
-  <div id="familyView" class="hidden"> 
-    <div class="church-banner-fallback"> 
-      <span class="cross-icon">✝</span> 
-      <h1 id="vTitle">Parish Record Card</h1> 
-    </div> 
-    <div id="vCardOutputZone"></div> 
-    <button style="background: #2d2d2d; margin-top: 20px;" onclick="logoutFamily()">🚪 Close Registry Viewer</button> 
-  </div> 
-</div> 
-
-<script> 
-const CLOUD_API_GATEWAY_URL = "https://script.google.com/macros/s/AKfycbzjMGz7XFNRF3DXNLQNo_bRaeCHrCOs91rqw4GMAenA1ToO-V_7A11SioTPAEvYc6RqRA/exec"; 
-
-let masterDatabaseFile = {}; 
-let tempFamily = { members: [] }; 
-let temporaryMemberPhotoBase64 = ""; 
-let temporaryFamilyPhotoBase64 = ""; 
-let editingMemberIndex = -1; 
-
-window.addEventListener('DOMContentLoaded', () => { 
-  const localData = localStorage.getItem('OLMC_Parish_Local_Database'); 
-  if (localData) { 
-    try { 
-      masterDatabaseFile = JSON.parse(localData); 
-      updateParishDashboardCounters(); 
-    } catch (e) { 
-      masterDatabaseFile = {}; 
-    } 
-  } 
-  
-  // Session Persistence Check
-  if (sessionStorage.getItem('OLMC_Admin_LoggedIn') === 'true') {
-    document.getElementById('loginScreen').classList.add('hidden');
-    document.getElementById('adminDashboard').classList.remove('hidden');
-  } else if (sessionStorage.getItem('OLMC_Family_LoggedIn')) {
-    const familyKey = sessionStorage.getItem('OLMC_Family_LoggedIn');
-    if (masterDatabaseFile[familyKey]) {
-      document.getElementById('loginScreen').classList.add('hidden');
-      document.getElementById('familyView').classList.remove('hidden');
-      document.getElementById('vTitle').innerText = "Parish Card: Family #" + masterDatabaseFile[familyKey].fNo;
-      generateVisualDisplayBox(masterDatabaseFile[familyKey], 'vCardOutputZone');
-    }
-  }
-
-  fetchCloudDataOnLoad(); 
-}); 
-
-async function fetchCloudDataOnLoad() { 
-  const statusText = document.getElementById('storageStatusText'); 
-  if (statusText) { 
-    statusText.innerText = "⏳ Cloud-லிருந்து தரவுகள் புதுப்பிக்கப்படுகின்றன..."; 
-    statusText.style.color = "#d97706"; 
-  } 
-  try { 
-    const response = await fetch(CLOUD_API_GATEWAY_URL); 
-    const cloudData = await response.json(); 
-    if (Array.isArray(cloudData) && cloudData.length > 0) { 
-      masterDatabaseFile = {}; 
-      cloudData.forEach(family => { 
-        masterDatabaseFile['church_family_' + family.fNo] = family; 
-      }); 
-      localStorage.setItem('OLMC_Parish_Local_Database', JSON.stringify(masterDatabaseFile)); 
-      updateParishDashboardCounters(); 
-      if (statusText) { 
-        statusText.innerText = `✅ Cloud தரவுகள் புதுப்பிக்கப்பட்டன! (${Object.keys(masterDatabaseFile).length} குடும்பங்கள்)`; 
-        statusText.style.color = "#16a34a"; 
-      } 
-    } 
-  } catch (error) { 
-    console.error("Cloud Fetch Error:", error); 
-    if (statusText) { 
-      const count = Object.keys(masterDatabaseFile).length; 
-      statusText.innerText = `✅ Local Memory-இல் ${count} குடும்பங்கள் உள்ளன. (Cloud இணைப்பில் சிக்கல்)`; 
-      statusText.style.color = "#475569"; 
-    } 
-  } 
-} 
-
-function handleAdminAuthentication() {
-  const secretKey = document.getElementById('adminSecretPass').value.trim();
-  if (secretKey === "Carmel" || secretKey === "admin") {
-    sessionStorage.setItem('OLMC_Admin_LoggedIn', 'true');
-    document.getElementById('loginScreen').classList.add('hidden');
-    document.getElementById('adminDashboard').classList.remove('hidden');
-  } else {
-    alert("⚠️ Incorrect Master Security Passphrase!");
-  }
-}
-
-function logoutAdmin() {
-  sessionStorage.removeItem('OLMC_Admin_LoggedIn');
-  document.getElementById('adminDashboard').classList.add('hidden');
-  document.getElementById('loginScreen').classList.remove('hidden');
-  document.getElementById('adminSecretPass').value = '';
-}
-
-function handleFamilyLogin() {
-  const fUid = document.getElementById('famUid').value.trim();
-  const fPwd = document.getElementById('famPwd').value.trim();
-
-  let matchedKey = null;
-  for (const key in masterDatabaseFile) {
-    const fam = masterDatabaseFile[key];
-    if ((fam.loginId && fam.loginId.toLowerCase() === fUid.toLowerCase()) || fam.fNo === fUid) {
-      if (fam.password === fPwd) {
-        matchedKey = key;
-        break;
-      }
-    }
-  }
-
-  if (matchedKey) {
-    sessionStorage.setItem('OLMC_Family_LoggedIn', matchedKey);
-    document.getElementById('loginScreen').classList.add('hidden');
-    document.getElementById('familyView').classList.remove('hidden');
-    document.getElementById('vTitle').innerText = "Parish Card: Family #" + masterDatabaseFile[matchedKey].fNo;
-    generateVisualDisplayBox(masterDatabaseFile[matchedKey], 'vCardOutputZone');
-  } else {
-    alert("⚠️ Invalid Family ID or Password!");
-  }
-}
-
-function logoutFamily() {
-  sessionStorage.removeItem('OLMC_Family_LoggedIn');
-  document.getElementById('familyView').classList.add('hidden');
-  document.getElementById('loginScreen').classList.remove('hidden');
-  document.getElementById('famUid').value = '';
-  document.getElementById('famPwd').value = '';
-}
-
-function getCurrentGPSLocation() { 
-  const statusText = document.getElementById('gpsStatus'); 
-  const inputField = document.getElementById('houseLocationUrl'); 
-  if (!navigator.geolocation) { 
-    alert("⚠️ உங்கள் பிரவுசரில் Geolocation வசதி இல்லை."); 
-    return; 
-  } 
-  statusText.innerText = "⏳ இருப்பிடம் பெறப்படுகிறது..."; 
-  statusText.style.color = "#d97706"; 
-  navigator.geolocation.getCurrentPosition( 
-    (position) => { 
-      const lat = position.coords.latitude; 
-      const lng = position.coords.longitude; 
-      const googleMapsUrl = `https://www.google.com/maps?q=${lat},${lng}`; 
-      inputField.value = googleMapsUrl; 
-      statusText.innerText = "✅ GPS லொகேஷன் வெற்றிகரமாகச் சேர்க்கப்பட்டது!"; 
-      statusText.style.color = "#16a34a"; 
-    }, 
-    (error) => { 
-      console.error("GPS Error:", error); 
-      statusText.innerText = "❌ GPS பெறுவதில் தோல்வி (Permission blocked/HTTP)."; 
-      statusText.style.color = "#dc2626"; 
-    }, 
-    { enableHighAccuracy: false, timeout: 30000, maximumAge: 60000 } 
-  ); 
-} 
-
-function updateParishDashboardCounters() { 
-  const familyKeys = Object.keys(masterDatabaseFile); 
-  const totalFamilies = familyKeys.length; 
-  let totalPeople = 0; 
-  
-  familyKeys.forEach(key => { 
-    const family = masterDatabaseFile[key]; 
-    if (family) {
-      if (Array.isArray(family.members)) {
-        totalPeople += family.members.length;
-      } else if (typeof family.members === 'string') {
-        try {
-          const parsed = JSON.parse(family.members);
-          if (Array.isArray(parsed)) totalPeople += parsed.length;
-        } catch(e) {}
-      }
-    }
-  }); 
-
-  const familyCounterEl = document.getElementById('totalFamiliesCount'); 
-  const peopleCounterEl = document.getElementById('totalPeopleCount'); 
-  if (familyCounterEl) familyCounterEl.innerText = totalFamilies; 
-  if (peopleCounterEl) peopleCounterEl.innerText = totalPeople; 
-} 
-
-function toggleFamilyDirectoryView() { 
-  const panel = document.getElementById('quickCounterDirectoryView'); 
-  const title = document.getElementById('directoryPanelTitle'); 
-  const listContainer = document.getElementById('directoryContentList'); 
-  title.innerText = "🏡 Registered Families Directory"; 
-  panel.classList.remove('hidden'); 
-  listContainer.innerHTML = ''; 
-  const familyKeys = Object.keys(masterDatabaseFile); 
-  if (familyKeys.length === 0) { 
-    listContainer.innerHTML = `<p style="font-size:0.85rem; color:#777; margin:5px 0;">No family entries registered yet.</p>`; 
-    return; 
-  } 
-  familyKeys.forEach(key => { 
-    const fam = masterDatabaseFile[key]; 
-    let memberCount = 0;
-    if (Array.isArray(fam.members)) memberCount = fam.members.length;
-    else if (typeof fam.members === 'string') {
-      try { memberCount = JSON.parse(fam.members).length; } catch(e){}
-    }
-    listContainer.innerHTML += ` 
-      <div style="background:#f8f9fa; border:1px solid #cbd5e1; border-radius:8px; padding:10px; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;"> 
-        <div> 
-          <b style="color:var(--primary-velvet);">Card #${fam.fNo}</b> (${fam.anbiyam || 'No Unit'})<br> 
-          <span style="font-size:0.75rem; color:#555;">Members: <b>${memberCount}</b> | Addr: ${fam.address || 'N/A'}</span> 
-        </div> 
-        <div style="display:flex; gap:5px;"> 
-          <button style="width:auto; padding:5px 8px; font-size:0.75rem; margin:0; background:#007bff;" onclick="loadFamilyIntoWorkspace('${key}')">✏️ View/Edit</button> 
-          <button class="btn-delete" onclick="deleteEntireFamilyRecord('${key}', '${fam.fNo}')">🗑️ Delete</button> 
-        </div> 
-      </div>`; 
-  }); 
-} 
-
-function togglePeopleDirectoryView() { 
-  const panel = document.getElementById('quickCounterDirectoryView'); 
-  const title = document.getElementById('directoryPanelTitle'); 
-  const listContainer = document.getElementById('directoryContentList'); 
-  title.innerText = "👥 All Parish Members Directory"; 
-  panel.classList.remove('hidden'); 
-  listContainer.innerHTML = ''; 
-  let allMembers = []; 
-  for (const key in masterDatabaseFile) { 
-    const fam = masterDatabaseFile[key]; 
-    let mList = [];
-    if (Array.isArray(fam.members)) mList = fam.members;
-    else if (typeof fam.members === 'string') {
-      try { mList = JSON.parse(fam.members); } catch(e){}
-    }
-    mList.forEach(m => { 
-      allMembers.push({ ...m, familyNo: fam.fNo, anbiyam: fam.anbiyam }); 
-    }); 
-  } 
-  if (allMembers.length === 0) { 
-    listContainer.innerHTML = `<p style="font-size:0.85rem; color:#777; margin:5px 0;">No individual members registered yet.</p>`; 
-    return; 
-  } 
-  allMembers.forEach(m => { 
-    listContainer.innerHTML += ` 
-      <div style="background:#f8f9fa; border:1px solid #cbd5e1; border-radius:6px; padding:8px; margin-bottom:6px;"> 
-        <b>👤 ${m.name}</b> (Age: ${m.age || 'N/A'})<br> 
-        <span style="font-size:0.75rem; color:#555;">Family Card Key: <b>#${m.familyNo}</b> | Unit: <b>${m.anbiyam || 'N/A'}</b></span> 
-      </div>`; 
-  }); 
-} 
-
-function closeCounterDirectoryView() { 
-  document.getElementById('quickCounterDirectoryView').classList.add('hidden'); 
-} 
-
-function deleteEntireFamilyRecord(key, familyNo) { 
-  if (confirm(`⚠️ Are you sure you want to completely delete Family Card #${familyNo}? This action cannot be undone.`)) { 
-    delete masterDatabaseFile[key]; 
-    localStorage.setItem('OLMC_Parish_Local_Database', JSON.stringify(masterDatabaseFile)); 
-    
-    if (CLOUD_API_GATEWAY_URL) {
-      fetch(CLOUD_API_GATEWAY_URL, {
-        method: 'POST',
-        mode: 'no-cors',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: "DELETE", fNo: familyNo })
-      }).then(() => console.log("Cloud Delete Synced!"))
-        .catch(err => console.error("Cloud Delete Error:", err));
-    }
-
-    updateParishDashboardCounters(); 
-    toggleFamilyDirectoryView(); 
-    document.getElementById('activeCardDisplayZone').innerHTML = ''; 
-    alert(`🗑️ Family Card #${familyNo} has been deleted permanently from Local & Cloud!`); 
-  } 
-} 
-
-function togglePasswordVisibility(fieldId) { 
-  const inputField = document.getElementById(fieldId); 
-  inputField.type = inputField.type === "password" ? "text" : "password"; 
-} 
-
-function filterParishEvents() {
-  const selectedMonth = document.getElementById('eventMonthFilter').value;
-  const eventType = document.getElementById('eventTypeFilter').value;
-  const outDiv = document.getElementById('eventsOutput');
-  outDiv.innerHTML = '';
-  let matchedEvents = [];
-
-  for (const key in masterDatabaseFile) {
-    const family = masterDatabaseFile[key];
-    let mList = Array.isArray(family.members) ? family.members : [];
-    if (typeof family.members === 'string') { try { mList = JSON.parse(family.members); } catch(e){} }
-
-    mList.forEach(m => {
-      if ((eventType === 'ALL' || eventType === 'BIRTHDAY') && m.dob) {
-        const d = new Date(m.dob);
-        if (!isNaN(d.getTime()) && (selectedMonth === "" || selectedMonth == d.getMonth())) {
-          matchedEvents.push({ type: '🎂 Birthday', name: m.name, dateStr: d.getDate() + ' ' + getMonthName(d.getMonth()), cardNo: family.fNo, anbiyam: family.anbiyam || 'N/A', fullDate: m.dob });
+            try {
+                const response = await fetch(CLOUD_API_GATEWAY_URL);
+                const cloudData = await response.json();
+                
+                if (Array.isArray(cloudData) && cloudData.length > 0) {
+                    masterDatabaseFile = {};
+                    cloudData.forEach(family => {
+                        masterDatabaseFile['church_family_' + family.fNo] = family;
+                    });
+                    localStorage.setItem('OLMC_Parish_Local_Database', JSON.stringify(masterDatabaseFile));
+                    updateParishDashboardCounters();
+                    if (statusText) {
+                        statusText.innerText = `✅ Cloud தரவுகள் புதுப்பிக்கப்பட்டன! (${Object.keys(masterDatabaseFile).length} குடும்பங்கள்)`;
+                        statusText.style.color = "#16a34a";
+                    }
+                }
+            } catch (error) {
+                console.error("Cloud Fetch Error:", error);
+                if (statusText) {
+                    const count = Object.keys(masterDatabaseFile).length;
+                    statusText.innerText = `✅ Local Memory-இல் ${count} குடும்பங்கள் உள்ளன. (Cloud இணைப்பில் சிக்கல்)`;
+                    statusText.style.color = "#475569";
+                }
+            }
         }
-      }
-      if ((eventType === 'ALL' || eventType === 'WEDDING') && m.mar) {
-        const d = new Date(m.mar);
-        if (!isNaN(d.getTime()) && (selectedMonth === "" || selectedMonth == d.getMonth())) {
-          matchedEvents.push({ type: '💍 Wedding Anniversary', name: m.name, dateStr: d.getDate() + ' ' + getMonthName(d.getMonth()), cardNo: family.fNo, anbiyam: family.anbiyam || 'N/A', fullDate: m.mar });
+
+        function getCurrentGPSLocation() {
+            const statusText = document.getElementById('gpsStatus');
+            const inputField = document.getElementById('houseLocationUrl');
+
+            if (!navigator.geolocation) {
+                alert("⚠️ உங்கள் பிரவுசரில் Geolocation வசதி இல்லை.");
+                return;
+            }
+
+            statusText.innerText = "⏳ இருப்பிடம் பெறப்படுகிறது...";
+            statusText.style.color = "#d97706";
+
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    const lat = position.coords.latitude;
+                    const lng = position.coords.longitude;
+                    const googleMapsUrl = `https://www.google.com/maps?q=${lat},${lng}`;
+                    inputField.value = googleMapsUrl;
+                    statusText.innerText = "✅ GPS லொகேஷன் வெற்றிகரமாகச் சேர்க்கப்பட்டது!";
+                    statusText.style.color = "#16a34a";
+                },
+                (error) => {
+                    console.error("GPS Error:", error);
+                    statusText.innerText = "❌ GPS பெறுவதில் தோல்வி (Permission blocked/HTTP).";
+                    statusText.style.color = "#dc2626";
+                },
+                { enableHighAccuracy: false, timeout: 30000, maximumAge: 60000 }
+            );
         }
-      }
-      if ((eventType === 'ALL' || eventType === 'DEATH') && m.death) {
-        const d = new Date(m.death);
-        if (!isNaN(d.getTime()) && (selectedMonth === "" || selectedMonth == d.getMonth())) {
-          matchedEvents.push({ type: '✝ Remembrance Day', name: m.name, dateStr: d.getDate() + ' ' + getMonthName(d.getMonth()), cardNo: family.fNo, anbiyam: family.anbiyam || 'N/A', fullDate: m.death });
+
+        function updateParishDashboardCounters() {
+            const familyKeys = Object.keys(masterDatabaseFile);
+            const totalFamilies = familyKeys.length;
+            let totalPeople = 0;
+
+            familyKeys.forEach(key => {
+                const family = masterDatabaseFile[key];
+                if (family) {
+                    if (Array.isArray(family.members)) {
+                        totalPeople += family.members.length;
+                    } else if (typeof family.members === 'string') {
+                        try {
+                            const parsed = JSON.parse(family.members);
+                            if (Array.isArray(parsed)) totalPeople += parsed.length;
+                        } catch(e) {}
+                    }
+                }
+            });
+
+            const familyCounterEl = document.getElementById('totalFamiliesCount');
+            const peopleCounterEl = document.getElementById('totalPeopleCount');
+            
+            if (familyCounterEl) familyCounterEl.innerText = totalFamilies;
+            if (peopleCounterEl) peopleCounterEl.innerText = totalPeople;
         }
-      }
-    });
-  }
 
-  if (matchedEvents.length === 0) {
-    outDiv.innerHTML = `<p style="color:#721c24; font-size:0.85rem; font-weight:bold; margin:5px 0 0 0;">🎉 No events found for this selection.</p>`;
-    return;
-  }
+        function toggleFamilyDirectoryView() {
+            const panel = document.getElementById('quickCounterDirectoryView');
+            const title = document.getElementById('directoryPanelTitle');
+            const listContainer = document.getElementById('directoryContentList');
 
-  let rowsHTML = matchedEvents.map(e => `
-    <div class="event-result-row">
-      <b>${e.type}</b>: <b>${e.name}</b> (${e.dateStr})<br>
-      <span style="font-size:0.75rem; color:#475569;">⛪ Unit: <b>${e.anbiyam}</b> | 📇 Family Card: <b>#${e.cardNo}</b> | Full Date: ${e.fullDate}</span>
-    </div>
-  `).join('');
+            title.innerText = "🏡 Registered Families Directory";
+            panel.classList.remove('hidden');
+            listContainer.innerHTML = '';
 
-  outDiv.innerHTML = `<div style="background:#f3e8ff; color:#6b21a8; padding:8px; border-radius:6px; font-weight:bold; font-size:0.85rem; margin-bottom:8px;">🎉 Total Events Found: ${matchedEvents.length}</div>${rowsHTML}`;
-}
+            const familyKeys = Object.keys(masterDatabaseFile);
+            if (familyKeys.length === 0) {
+                listContainer.innerHTML = `<p style="font-size:0.85rem; color:#777; margin:5px 0;">No family entries registered yet.</p>`;
+                return;
+            }
 
-function filterTodayEvents() {
-  const today = new Date();
-  const currentMonth = today.getMonth();
-  const currentDate = today.getDate();
-  const outDiv = document.getElementById('eventsOutput');
-  outDiv.innerHTML = '';
-  let todayEvents = [];
+            familyKeys.forEach(key => {
+                const fam = masterDatabaseFile[key];
+                let memberCount = 0;
+                if (Array.isArray(fam.members)) memberCount = fam.members.length;
+                else if (typeof fam.members === 'string') {
+                    try { memberCount = JSON.parse(fam.members).length; } catch(e){}
+                }
 
-  for (const key in masterDatabaseFile) {
-    const family = masterDatabaseFile[key];
-    let mList = Array.isArray(family.members) ? family.members : [];
-    if (typeof family.members === 'string') { try { mList = JSON.parse(family.members); } catch(e){} }
-
-    mList.forEach(m => {
-      if (m.dob) {
-        const d = new Date(m.dob);
-        if (!isNaN(d.getTime()) && d.getMonth() === currentMonth && d.getDate() === currentDate) {
-          todayEvents.push({ type: '🎂 Birthday Today!', name: m.name, cardNo: family.fNo });
+                listContainer.innerHTML += `
+                    <div style="background:#f8f9fa; border:1px solid #cbd5e1; border-radius:8px; padding:10px; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;">
+                        <div>
+                            <b style="color:var(--primary-velvet);">Card #${fam.fNo}</b> (${fam.anbiyam || 'No Unit'})<br>
+                            <span style="font-size:0.75rem; color:#555;">Members: <b>${memberCount}</b> | Addr: ${fam.address || 'N/A'}</span>
+                        </div>
+                        <div style="display:flex; gap:5px;">
+                            <button style="width:auto; padding:5px 8px; font-size:0.75rem; margin:0; background:#007bff;" onclick="loadFamilyIntoWorkspace('${key}')">✏️ View/Edit</button>
+                            <button class="btn-delete" onclick="deleteEntireFamilyRecord('${key}', '${fam.fNo}')">🗑️ Delete</button>
+                        </div>
+                    </div>`;
+            });
         }
-      }
-      if (m.mar) {
-        const d = new Date(m.mar);
-        if (!isNaN(d.getTime()) && d.getMonth() === currentMonth && d.getDate() === currentDate) {
-          todayEvents.push({ type: '💍 Wedding Anniversary Today!', name: m.name, cardNo: family.fNo });
+
+        function togglePeopleDirectoryView() {
+            const panel = document.getElementById('quickCounterDirectoryView');
+            const title = document.getElementById('directoryPanelTitle');
+            const listContainer = document.getElementById('directoryContentList');
+
+            title.innerText = "👥 All Parish Members Directory";
+            panel.classList.remove('hidden');
+            listContainer.innerHTML = '';
+
+            let allMembers = [];
+            for (const key in masterDatabaseFile) {
+                const fam = masterDatabaseFile[key];
+                let mList = [];
+                if (Array.isArray(fam.members)) mList = fam.members;
+                else if (typeof fam.members === 'string') {
+                    try { mList = JSON.parse(fam.members); } catch(e){}
+                }
+                mList.forEach(m => {
+                    allMembers.push({ ...m, familyNo: fam.fNo, anbiyam: fam.anbiyam });
+                });
+            }
+
+            if (allMembers.length === 0) {
+                listContainer.innerHTML = `<p style="font-size:0.85rem; color:#777; margin:5px 0;">No individual members registered yet.</p>`;
+                return;
+            }
+
+            allMembers.forEach(m => {
+                listContainer.innerHTML += `
+                    <div style="background:#f8f9fa; border:1px solid #cbd5e1; border-radius:6px; padding:8px; margin-bottom:6px;">
+                        <b>👤 ${m.name}</b> (Age: ${m.age || 'N/A'})<br>
+                        <span style="font-size:0.75rem; color:#555;">Family Card Key: <b>#${m.familyNo}</b> | Unit: <b>${m.anbiyam || 'N/A'}</b></span>
+                    </div>`;
+            });
         }
-      }
-      if (m.death) {
-        const d = new Date(m.death);
-        if (!isNaN(d.getTime()) && d.getMonth() === currentMonth && d.getDate() === currentDate) {
-          todayEvents.push({ type: '✝ Remembrance Day Today!', name: m.name, cardNo: family.fNo });
+
+        function closeCounterDirectoryView() {
+            document.getElementById('quickCounterDirectoryView').classList.add('hidden');
         }
-      }
-    });
-  }
 
-  if (todayEvents.length === 0) {
-    outDiv.innerHTML = `<p style="color:#721c24; font-size:0.85rem; font-weight:bold; margin:5px 0 0 0;">⭐ No events registered for Today (${currentDate} ${getMonthName(currentMonth)}).</p>`;
-    return;
-  }
+        function deleteEntireFamilyRecord(key, familyNo) {
+            if (confirm(`⚠️ Are you sure you want to completely delete Family Card #${familyNo}? This action cannot be undone.`)) {
+                delete masterDatabaseFile[key];
+                localStorage.setItem('OLMC_Parish_Local_Database', JSON.stringify(masterDatabaseFile));
+                
+                if (CLOUD_API_GATEWAY_URL) {
+                    fetch(CLOUD_API_GATEWAY_URL, {
+                        method: 'POST',
+                        mode: 'no-cors',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ action: "DELETE", fNo: familyNo })
+                    }).then(() => console.log("Cloud Delete Synced!"))
+                    .catch(err => console.error("Cloud Delete Error:", err));
+                }
 
-  let rowsHTML = todayEvents.map(e => `
-    <div class="event-result-row" style="border-left-color: #22c55e;">
-      <b>${e.type}</b> - <b>${e.name}</b> (Family Card #${e.cardNo})
-    </div>
-  `).join('');
+                updateParishDashboardCounters();
+                toggleFamilyDirectoryView();
+                document.getElementById('activeCardDisplayZone').innerHTML = '';
+                alert(`🗑️ Family Card #${familyNo} has been deleted permanently from Local & Cloud!`);
+            }
+        }
 
-  outDiv.innerHTML = `<div style="background:#dcfce7; color:#15803d; padding:8px; border-radius:6px; font-weight:bold; font-size:0.85rem; margin-bottom:8px;">⭐ Today's Special Events (${todayEvents.length})</div>${rowsHTML}`;
-}
+        function filterParishEvents() {
+            const selectedMonth = document.getElementById('eventMonthFilter').value;
+            const eventType = document.getElementById('eventTypeFilter').value;
+            const outDiv = document.getElementById('eventsOutput');
+            outDiv.innerHTML = '';
 
-function getMonthName(mIdx) {
-  const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-  return months[mIdx] || "";
-}
+            let matchedEvents = [];
 
-function executeExcelScreener() { 
-  const minAgeVal = document.getElementById('analyticsMinAge').value; 
-  const maxAgeVal = document.getElementById('analyticsMaxAge').value; 
-  const anbiyamQuery = document.getElementById('analyticsAnbiyam').value.toLowerCase().trim(); 
-  const outDiv = document.getElementById('analyticsOutput'); 
-  outDiv.innerHTML = ''; 
-  const minAge = minAgeVal !== "" ? parseInt(minAgeVal, 10) : 0; 
-  const maxAge = maxAgeVal !== "" ? parseInt(maxAgeVal, 10) : Infinity; 
-  let matchingPeople = []; 
+            for (const key in masterDatabaseFile) {
+                const family = masterDatabaseFile[key];
+                let mList = Array.isArray(family.members) ? family.members : [];
+                if (typeof family.members === 'string') {
+                    try { mList = JSON.parse(family.members); } catch(e){}
+                }
 
-  for (const key in masterDatabaseFile) { 
-    const family = masterDatabaseFile[key]; 
-    const familyAnbiyam = (family.anbiyam || "").toLowerCase(); 
-    if (anbiyamQuery && !familyAnbiyam.includes(anbiyamQuery)) continue; 
+                mList.forEach(m => {
+                    if ((eventType === 'ALL' || eventType === 'BIRTHDAY') && m.dob) {
+                        const d = new Date(m.dob);
+                        if (!isNaN(d.getTime()) && (selectedMonth === "" || selectedMonth == d.getMonth())) {
+                            matchedEvents.push({ type: '🎂 Birthday', name: m.name, dateStr: d.getDate() + ' ' + getMonthName(d.getMonth()), cardNo: family.fNo, anbiyam: family.anbiyam || 'N/A', fullDate: m.dob });
+                        }
+                    }
+                    if ((eventType === 'ALL' || eventType === 'WEDDING') && m.mar) {
+                        const d = new Date(m.mar);
+                        if (!isNaN(d.getTime()) && (selectedMonth === "" || selectedMonth == d.getMonth())) {
+                            matchedEvents.push({ type: '💍 Wedding Anniversary', name: m.name, dateStr: d.getDate() + ' ' + getMonthName(d.getMonth()), cardNo: family.fNo, anbiyam: family.anbiyam || 'N/A', fullDate: m.mar });
+                        }
+                    }
+                    if ((eventType === 'ALL' || eventType === 'DEATH') && m.death) {
+                        const d = new Date(m.death);
+                        if (!isNaN(d.getTime()) && (selectedMonth === "" || selectedMonth == d.getMonth())) {
+                            matchedEvents.push({ type: '✝ Remembrance Day', name: m.name, dateStr: d.getDate() + ' ' + getMonthName(d.getMonth()), cardNo: family.fNo, anbiyam: family.anbiyam || 'N/A', fullDate: m.death });
+                        }
+                    }
+                });
+            }
 
-    let mList = Array.isArray(family.members) ? family.members : [];
-    if (typeof family.members === 'string') { try { mList = JSON.parse(family.members); } catch(e){} }
+            if (matchedEvents.length === 0) {
+                outDiv.innerHTML = `<p style="color:#721c24; font-size:0.85rem; font-weight:bold; margin:5px 0 0 0;">🎉 No events found for this selection.</p>`;
+                return;
+            }
 
-    mList.forEach(m => { 
-      const ageNum = parseInt(m.age, 10); 
-      if (!isNaN(ageNum) && ageNum >= minAge && ageNum <= maxAge) { 
-        matchingPeople.push({ name: m.name, age: ageNum, anbiyam: family.anbiyam || 'Not Assigned', cardNo: family.fNo }); 
-      } 
-    }); 
-  } 
+            let rowsHTML = matchedEvents.map(e => `
+                <div class="event-result-row">
+                    <b>${e.type}</b>: <b>${e.name}</b> (${e.dateStr})<br>
+                    <span style="font-size:0.75rem; color:#475569;">⛪ Unit: <b>${e.anbiyam}</b> | 📇 Family Card: <b>#${e.cardNo}</b> | Full Date: ${e.fullDate}</span>
+                </div>
+            `).join('');
 
-  if (matchingPeople.length === 0) { 
-    outDiv.innerHTML = `<p style="color:red; font-size:0.85rem; font-weight:bold; margin:5px 0 0 0;">📊 0 records matched these metrics.</p>`; 
-    return; 
-  } 
+            outDiv.innerHTML = `<div style="background:#f3e8ff; color:#6b21a8; padding:8px; border-radius:6px; font-weight:bold; font-size:0.85rem; margin-bottom:8px;">🎉 Total Events Found: ${matchedEvents.length}</div>${rowsHTML}`;
+        }
 
-  let rowsHTML = matchingPeople.map(p => ` 
-    <div class="analytics-result-row"> 
-      👤 <b>${p.name}</b> (Age: ${p.age}) <br> 
-      <span style="font-size:0.75rem; color:#475569;">⛪ NBM Unit: <b>${p.anbiyam}</b> | 📇 Family Card Key: <b>#${p.cardNo}</b></span> 
-    </div> 
-  `).join(''); 
+        function filterTodayEvents() {
+            const today = new Date();
+            const currentMonth = today.getMonth();
+            const currentDate = today.getDate();
+            const outDiv = document.getElementById('eventsOutput');
+            outDiv.innerHTML = '';
 
-  outDiv.innerHTML = `<div style="background:#e6f4ea; color:#137333; padding:8px; border-radius:6px; font-weight:bold; font-size:0.85rem; margin-bottom:8px;">📊 Count Total: ${matchingPeople.length} Parishioners Located</div>${rowsHTML}`; 
-} 
+            let todayEvents = [];
 
-function saveFamilyToMemoryBundle() { 
-  const serialNo = document.getElementById('fNo').value.trim(); 
-  if(!serialNo) return alert("Family Card Number tracking key missing!"); 
-  const photoUrlInput = document.getElementById('familyHeroPhotoUrl').value.trim(); 
-  const finalFamilyPhoto = photoUrlInput || temporaryFamilyPhotoBase64; 
+            for (const key in masterDatabaseFile) {
+                const family = masterDatabaseFile[key];
+                let mList = Array.isArray(family.members) ? family.members : [];
+                if (typeof family.members === 'string') {
+                    try { mList = JSON.parse(family.members); } catch(e){}
+                }
 
-  const familyObject = { 
-    fNo: serialNo, 
-    loginId: document.getElementById('famLoginId').value.trim() || 'MC '+serialNo, 
-    password: document.getElementById('famPassword').value.trim() || 'Carmel', 
-    anbiyam: document.getElementById('anbiyamName').value, 
-    address: document.getElementById('address').value, 
-    locationUrl: document.getElementById('houseLocationUrl').value, 
-    familyPhoto: finalFamilyPhoto, 
-    members: tempFamily.members 
-  }; 
+                mList.forEach(m => {
+                    if (m.dob) {
+                        const d = new Date(m.dob);
+                        if (!isNaN(d.getTime()) && d.getMonth() === currentMonth && d.getDate() === currentDate) {
+                            todayEvents.push({ type: '🎂 Birthday Today!', name: m.name, cardNo: family.fNo });
+                        }
+                    }
+                    if (m.mar) {
+                        const d = new Date(m.mar);
+                        if (!isNaN(d.getTime()) && d.getMonth() === currentMonth && d.getDate() === currentDate) {
+                            todayEvents.push({ type: '💍 Wedding Anniversary Today!', name: m.name, cardNo: family.fNo });
+                        }
+                    }
+                    if (m.death) {
+                        const d = new Date(m.death);
+                        if (!isNaN(d.getTime()) && d.getMonth() === currentMonth && d.getDate() === currentDate) {
+                            todayEvents.push({ type: '✝ Remembrance Day Today!', name: m.name, cardNo: family.fNo });
+                        }
+                    }
+                });
+            }
 
-  masterDatabaseFile['church_family_' + serialNo] = familyObject; 
+            if (todayEvents.length === 0) {
+                outDiv.innerHTML = `<p style="color:#721c24; font-size:0.85rem; font-weight:bold; margin:5px 0 0 0;">⭐ No events registered for Today (${currentDate} ${getMonthName(currentMonth)}).</p>`;
+                return;
+            }
 
-  try { 
-    localStorage.setItem('OLMC_Parish_Local_Database', JSON.stringify(masterDatabaseFile)); 
-    generateVisualDisplayBox(masterDatabaseFile['church_family_' + serialNo], 'activeCardDisplayZone', 'church_family_' + serialNo); 
-    updateParishDashboardCounters(); 
+            let rowsHTML = todayEvents.map(e => `
+                <div class="event-result-row" style="border-left-color: #22c55e;">
+                    <b>${e.type}</b> - <b>${e.name}</b> (Family Card #${e.cardNo})
+                </div>
+            `).join('');
 
-    if (CLOUD_API_GATEWAY_URL) { 
-      fetch(CLOUD_API_GATEWAY_URL, { 
-        method: 'POST', 
-        mode: 'no-cors', 
-        headers: { 'Content-Type': 'application/json' }, 
-        body: JSON.stringify(familyObject) 
-      }).then(() => console.log("Cloud Backup Auto-Synced Successfully!"))
-        .catch(err => console.error("Cloud Sync Error:", err)); 
-    } 
+            outDiv.innerHTML = `<div style="background:#dcfce7; color:#15803d; padding:8px; border-radius:6px; font-weight:bold; font-size:0.85rem; margin-bottom:8px;">⭐ Today's Special Events (${todayEvents.length})</div>${rowsHTML}`;
+        }
 
-    alert(`🎉 Success! Family Card #${serialNo} saved in App & Auto-Synced to Cloud Sheet!`); 
-    resetForm(); 
-  } catch(e) { 
-    alert("⚠️ Storage Warning: Large direct images attached."); 
-  } 
-} 
+        function getMonthName(mIdx) {
+            const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+            return months[mIdx] || "";
+        }
 
-function exportOfflineDataFile() { 
-  const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(masterDatabaseFile)); 
-  const downloadAnchor = document.createElement('a'); 
-  downloadAnchor.setAttribute("href", dataStr); 
-  downloadAnchor.setAttribute("download", `Parish_Registry_Backup_${new Date().toISOString().slice(0,10)}.json`); 
-  document.body.appendChild(downloadAnchor); 
-  downloadAnchor.click(); 
-  downloadAnchor.remove(); 
-} 
+        function executeExcelScreener() {
+            const minAgeVal = document.getElementById('analyticsMinAge').value;
+            const maxAgeVal = document.getElementById('analyticsMaxAge').value;
+            const anbiyamQuery = document.getElementById('analyticsAnbiyam').value.toLowerCase().trim();
+            const outDiv = document.getElementById('analyticsOutput');
+            outDiv.innerHTML = '';
 
-function importOfflineDataFile(event) { 
-  const fileReader = new FileReader(); 
-  fileReader.onload = function(e) { 
-    try { 
-      const importedData = JSON.parse(e.target.result); 
-      masterDatabaseFile = { ...masterDatabaseFile, ...importedData }; 
-      localStorage.setItem('OLMC_Parish_Local_Database', JSON.stringify(masterDatabaseFile)); 
-      updateParishDashboardCounters(); 
-      alert("🎉 Import Successful! Mobile registry records merged cleanly."); 
-    } catch(err) { 
-      alert("⚠️ Invalid file format."); 
-    } 
-  }; 
-  fileReader.readAsText(event.target.files[0]); 
-} 
+            const minAge = minAgeVal !== "" ? parseInt(minAgeVal, 10) : 0;
+            const maxAge = maxAgeVal !== "" ? parseInt(maxAgeVal, 10) : Infinity;
 
-function generateVisualDisplayBox(family, elementId, key) { 
-  const target = document.getElementById(elementId); 
-  let familyHeroHTML = family.familyPhoto ? `<img src="${family.familyPhoto}" class="family-hero-photo" alt="Family Portrait">` : ''; 
+            let matchingPeople = [];
 
-  let mList = Array.isArray(family.members) ? family.members : [];
-  if (typeof family.members === 'string') { try { mList = JSON.parse(family.members); } catch(e){} }
+            for (const key in masterDatabaseFile) {
+                const family = masterDatabaseFile[key];
+                const familyAnbiyam = (family.anbiyam || "").toLowerCase();
 
-  let membersCardsHTML = mList.map(m => { 
-    const avatarSrc = m.photo || "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 24 24' fill='%23ccc'><path d='M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z'/></svg>"; 
-    return ` 
-      <div class="visual-member-card"> 
-        <img src="${avatarSrc}" class="member-avatar" alt="Avatar"> 
-        <div class="member-details"> 
-          <p class="member-name-heading">${m.name}</p> 
-          <span style="font-size:0.8rem; color:#555;">Age: <b>${m.age || 'N/A'}</b> | Vocation: <b>${m.work || '-'}</b></span> 
-          <div class="sacramental-grid"> 
-            <div class="sacrament-item">🎂 <b>DOB:</b> ${m.dob || '-'}</div> 
-            <div class="sacrament-item">🕊️ <b>Bap:</b> ${m.bap || '-'} ${m.bapPlace ? `(${m.bapPlace})` : ''}</div> 
-            <div class="sacrament-item">🍞 <b>Comm:</b> ${m.comm || '-'} ${m.commPlace ? `(${m.commPlace})` : ''}</div> 
-            <div class="sacrament-item">🔥 <b>Conf:</b> ${m.conf || '-'} ${m.confPlace ? `(${m.confPlace})` : ''}</div> 
-            <div class="sacrament-item">💍 <b>Wed:</b> ${m.mar || '-'} ${m.marPlace ? `(${m.marPlace})` : ''}</div> 
-            ${m.death ? `<div class="sacrament-item" style="color:#721c24;">✝ <b>Demise:</b> ${m.death}${m.deathPlace ? `(${m.deathPlace})` : ''}</div>` : ''} 
-          </div> 
-        </div> 
-      </div>`; 
-  }).join(''); 
+                if (anbiyamQuery && !familyAnbiyam.includes(anbiyamQuery)) continue;
 
-  if(mList.length === 0) membersCardsHTML = `<p style="font-size:0.85rem; color:#777; font-style:italic;">No family members listed.</p>`; 
-  const deleteButtonHTML = key ? `<button class="btn-delete" style="margin-top:10px;" onclick="deleteEntireFamilyRecord('${key}', '${family.fNo}')">🗑️ Delete Family Record</button>` : ''; 
-  const locationButtonHTML = family.locationUrl ? ` 
-    <div style="margin-top: 10px;"> 
-      <a href="${family.locationUrl}" target="_blank" style="display:inline-block; padding:10px 15px; background:#4285F4; color:white; text-decoration:none; border-radius:8px; font-weight:bold; font-size:0.85rem;"> 🗺️ Open Map & Navigate to House </a> 
-    </div> ` : ''; 
+                let mList = Array.isArray(family.members) ? family.members : [];
+                if (typeof family.members === 'string') {
+                    try { mList = JSON.parse(family.members); } catch(e){}
+                }
 
-  target.innerHTML = ` 
-    <div class="family-data-card"> 
-      <div class="card-header"> 
-        <h3 class="card-title">⛪ PARISHIONER DATA CARD</h3> 
-        <div class="card-id-badge">CARD NO: ${family.fNo}</div> 
-      </div> 
-      ${familyHeroHTML} 
-      <div class="card-info-box"> 
-        <b>⛪ Anbiyam Unit (NBM):</b> ${family.anbiyam || 'Not Specified'}<br> 
-        <b>🏠 Address:</b> ${family.address || 'Not Added'}<br> 
-        <span style="font-size:0.75rem; color:#666;">ID: <b>${family.loginId}</b> | Pwd: <b>${family.password}</b></span> 
-        ${locationButtonHTML} 
-      </div> 
-      <p style="font-size:0.8rem; font-weight:bold; color:var(--primary-velvet); margin:0 0 8px 0; text-transform:uppercase;">Family Members Registry Matrix</p> 
-      ${membersCardsHTML} 
-      ${deleteButtonHTML} 
-    </div>`; 
-} 
+                mList.forEach(m => {
+                    const ageNum = parseInt(m.age, 10);
+                    if (!isNaN(ageNum) && ageNum >= minAge && ageNum <= maxAge) {
+                        matchingPeople.push({
+                            name: m.name,
+                            age: ageNum,
+                            anbiyam: family.anbiyam || 'Not Assigned',
+                            cardNo: family.fNo
+                        });
+                    }
+                });
+            }
 
-function executeMasterSearch() { 
-  const query = document.getElementById('adminSearchInput').value.toLowerCase().trim(); 
-  const displayDiv = document.getElementById('searchResults'); 
-  displayDiv.innerHTML = ''; 
-  if (!query) return alert("Please type a card number or search term."); 
-  let matches = 0; 
+            if (matchingPeople.length === 0) {
+                outDiv.innerHTML = `<p style="color:red; font-size:0.85rem; font-weight:bold; margin:5px 0 0 0;">📊 0 records matched these metrics.</p>`;
+                return;
+            }
 
-  for (const key in masterDatabaseFile) { 
-    const family = masterDatabaseFile[key]; 
-    let mList = Array.isArray(family.members) ? family.members : [];
-    if (typeof family.members === 'string') { try { mList = JSON.parse(family.members); } catch(e){} }
+            let rowsHTML = matchingPeople.map(p => `
+                <div class="analytics-result-row">
+                    👤 <b>${p.name}</b> (Age: ${p.age}) <br>
+                    <span style="font-size:0.75rem; color:#475569;">⛪ NBM Unit: <b>${p.anbiyam}</b> | 📇 Family Card Key: <b>#${p.cardNo}</b></span>
+                </div>
+            `).join('');
 
-    let check = family.fNo.toLowerCase().includes(query) || (family.anbiyam && family.anbiyam.toLowerCase().includes(query)) || mList.some(m => m.name.toLowerCase().includes(query)); 
-    if (check) { 
-      matches++; 
-      displayDiv.innerHTML += ` 
-        <div style="background:#fff; padding:10px; margin-top:8px; border-radius:6px; border:1px solid #cbd5e1; display:flex; justify-content:space-between; align-items:center;"> 
-          <div><b>Card Key #${family.fNo}</b> (${family.anbiyam || 'General'})</div> 
-          <div> 
-            <button style="width:auto; padding:5px 10px; font-size:0.8rem; margin:0; background:#007bff;" onclick="loadFamilyIntoWorkspace('${key}')">✏️ Edit Card</button> 
-            <button class="btn-delete" style="padding:5px 8px;" onclick="deleteEntireFamilyRecord('${key}', '${family.fNo}')">🗑️</button> 
-          </div> 
-        </div>`; 
-    } 
-  } 
-  if(matches === 0) displayDiv.innerHTML = `<p style="color:red; font-size:0.8rem; margin-top:5px;">No structural family record located.</p>`; 
-} 
+            outDiv.innerHTML = `<div style="background:#e6f4ea; color:#137333; padding:8px; border-radius:6px; font-weight:bold; font-size:0.85rem; margin-bottom:8px;">📊 Count Total: ${matchingPeople.length} Parishioners Located</div>${rowsHTML}`;
+        }
 
-function loadFamilyIntoWorkspace(key) { 
-  const family = masterDatabaseFile[key]; 
-  document.getElementById('fNo').value = family.fNo; 
-  document.getElementById('famLoginId').value = family.loginId; 
-  document.getElementById('famPassword').value = family.password; 
-  document.getElementById('anbiyamName').value = family.anbiyam || ''; 
-  document.getElementById('address').value = family.address || ''; 
-  document.getElementById('houseLocationUrl').value = family.locationUrl || ''; 
+        function saveFamilyToMemoryBundle() {
+            const serialNo = document.getElementById('fNo').value.trim();
+            if(!serialNo) return alert("Family Card Number tracking key missing!");
 
-  if (family.familyPhoto) { 
-    if(family.familyPhoto.startsWith('http')) { 
-      document.getElementById('familyHeroPhotoUrl').value = family.familyPhoto; 
-    } 
-    document.getElementById('familyHeroPhotoPreview').src = family.familyPhoto; 
-    document.getElementById('familyHeroPhotoPreview').style.display = 'block'; 
-    temporaryFamilyPhotoBase64 = family.familyPhoto; 
-  } else { 
-    document.getElementById('familyHeroPhotoPreview').style.display = 'none'; 
-    temporaryFamilyPhotoBase64 = ""; 
-  } 
+            const photoUrlInput = document.getElementById('familyHeroPhotoUrl').value.trim();
+            const finalFamilyPhoto = photoUrlInput || temporaryFamilyPhotoBase64;
 
-  let mList = Array.isArray(family.members) ? family.members : [];
-  if (typeof family.members === 'string') { try { mList = JSON.parse(family.members); } catch(e){} }
-  tempFamily.members = mList; 
+            const familyObject = {
+                fNo: serialNo,
+                anbiyam: document.getElementById('anbiyamName').value,
+                address: document.getElementById('address').value,
+                locationUrl: document.getElementById('houseLocationUrl').value,
+                familyPhoto: finalFamilyPhoto,
+                members: tempFamily.members
+            };
 
-  renderMembersList(); 
-  generateVisualDisplayBox(family, 'activeCardDisplayZone', key); 
-  document.getElementById('searchResults').innerHTML = ''; 
-  document.getElementById('adminSearchInput').value = ''; 
-  closeCounterDirectoryView(); 
-} 
+            masterDatabaseFile['church_family_' + serialNo] = familyObject;
 
-function previewFamilyImage(uploader) { 
-  const file = uploader.files[0]; 
-  if (file) { 
-    const reader = new FileReader(); 
-    reader.onload = function(e) { 
-      document.getElementById('familyHeroPhotoPreview').src = e.target.result; 
-      document.getElementById('familyHeroPhotoPreview').style.display = 'block'; 
-      temporaryFamilyPhotoBase64 = e.target.result; 
-    }; 
-    reader.readAsDataURL(file); 
-  } 
-} 
+            try {
+                localStorage.setItem('OLMC_Parish_Local_Database', JSON.stringify(masterDatabaseFile));
+                generateVisualDisplayBox(masterDatabaseFile['church_family_' + serialNo], 'activeCardDisplayZone', 'church_family_' + serialNo);
+                updateParishDashboardCounters();
 
-function previewFamilyUrlImage(url) { 
-  if(url.trim()) { 
-    document.getElementById('familyHeroPhotoPreview').src = url; 
-    document.getElementById('familyHeroPhotoPreview').style.display = 'block'; 
-  } 
-} 
+                if (CLOUD_API_GATEWAY_URL) {
+                    fetch(CLOUD_API_GATEWAY_URL, {
+                        method: 'POST',
+                        mode: 'no-cors',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(familyObject)
+                    }).then(() => console.log("Cloud Backup Auto-Synced Successfully!"))
+                    .catch(err => console.error("Cloud Sync Error:", err));
+                }
 
-function previewImage(uploader, targetId) { 
-  const file = uploader.files[0]; 
-  if (file) { 
-    const reader = new FileReader(); 
-    reader.onload = function(e) { 
-      document.getElementById(targetId).src = e.target.result; 
-      document.getElementById(targetId).style.display = 'block'; 
-      temporaryMemberPhotoBase64 = e.target.result; 
-    }; 
-    reader.readAsDataURL(file); 
-  } 
-} 
+                alert(`🎉 Success! Family Card #${serialNo} saved in App & Auto-Synced to Cloud Sheet!`);
+                resetForm();
+            } catch(e) {
+                alert("⚠️ Storage Warning: Large direct images attached.");
+            }
+        }
 
-function previewUrlImage(url, targetId) { 
-  if(url.trim()) { 
-    document.getElementById(targetId).src = url; 
-    document.getElementById(targetId).style.display = 'block'; 
-  } 
-} 
+        function exportOfflineDataFile() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(masterDatabaseFile));
+            const downloadAnchor = document.createElement('a');
+            downloadAnchor.setAttribute("href", dataStr);
+            downloadAnchor.setAttribute("download", `Parish_Registry_Backup_${new Date().toISOString().slice(0,10)}.json`);
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
+        }
 
-function openMemberFormForNew() { 
-  editingMemberIndex = -1; 
-  document.getElementById('memberFormTitle').innerText = "👤 Individual Member Profile"; 
-  document.getElementById('memberForm').classList.remove('hidden'); 
-  document.querySelectorAll('#memberForm input').forEach(el => el.value = ''); 
-  document.getElementById('memberPhotoPreview').style.display = 'none'; 
-  temporaryMemberPhotoBase64 = ""; 
-} 
+        function importOfflineDataFile(event) {
+            const fileReader = new FileReader();
+            fileReader.onload = function(e) {
+                try {
+                    const importedData = JSON.parse(e.target.result);
+                    masterDatabaseFile = { ...masterDatabaseFile, ...importedData };
+                    localStorage.setItem('OLMC_Parish_Local_Database', JSON.stringify(masterDatabaseFile));
+                    updateParishDashboardCounters();
+                    alert("🎉 Import Successful! Mobile registry records merged cleanly.");
+                } catch(err) {
+                    alert("⚠️ Invalid file format.");
+                }
+            };
+            fileReader.readAsText(event.target.files[0]);
+        }
 
-function editMember(index) { 
-  editingMemberIndex = index; 
-  const m = tempFamily.members[index]; 
-  document.getElementById('memberFormTitle').innerText = "✏️ Edit Member Profile"; 
-  document.getElementById('memberForm').classList.remove('hidden'); 
-  document.getElementById('mName').value = m.name || ''; 
-  document.getElementById('mAge').value = m.age || ''; 
-  document.getElementById('mDob').value = m.dob || ''; 
-  document.getElementById('mWork').value = m.work || ''; 
-  document.getElementById('mPhone').value = m.phone || ''; 
-  document.getElementById('mBap').value = m.bap || ''; 
-  document.getElementById('mBapPlace').value = m.bapPlace || ''; 
-  document.getElementById('mComm').value = m.comm || ''; 
-  document.getElementById('mCommPlace').value = m.commPlace || '';
-  document.getElementById('mConf').value = m.conf || ''; 
-  document.getElementById('mConfPlace').value = m.confPlace || ''; 
-  document.getElementById('mMar').value = m.mar || ''; 
-  document.getElementById('mMarPlace').value = m.marPlace || ''; 
-  document.getElementById('mDeath').value = m.death || ''; 
-  document.getElementById('mDeathPlace').value = m.deathPlace || ''; 
+        function generateVisualDisplayBox(family, elementId, key) {
+            const target = document.getElementById(elementId);
+            let familyHeroHTML = family.familyPhoto ? `<img src="${family.familyPhoto}" class="family-hero-photo" alt="Family Portrait">` : '';
 
-  if (m.photo) {
-    if (m.photo.startsWith('http')) {
-      document.getElementById('memberPhotoUrl').value = m.photo;
-    }
-    document.getElementById('memberPhotoPreview').src = m.photo;
-    document.getElementById('memberPhotoPreview').style.display = 'block';
-    temporaryMemberPhotoBase64 = m.photo;
-  } else {
-    document.getElementById('memberPhotoPreview').style.display = 'none';
-    temporaryMemberPhotoBase64 = "";
-  }
-} 
+            let mList = Array.isArray(family.members) ? family.members : [];
+            if (typeof family.members === 'string') {
+                try { mList = JSON.parse(family.members); } catch(e){}
+            }
 
-function saveMemberToTemp() { 
-  const name = document.getElementById('mName').value.trim(); 
-  if(!name) return alert("Please enter the member's name."); 
+            let membersCardsHTML = mList.map(m => {
+                const avatarSrc = m.photo || "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 24 24' fill='%23ccc'><path d='M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z'/></svg>";
+                return `
+                    <div class="visual-member-card">
+                        <img src="${avatarSrc}" class="member-avatar" alt="Avatar">
+                        <div class="member-details">
+                            <p class="member-name-heading">${m.name}</p>
+                            <span style="font-size:0.8rem; color:#555;">Age: <b>${m.age || 'N/A'}</b> | Vocation: <b>${m.work || '-'}</b></span>
+                            <div class="sacramental-grid">
+                                <div class="sacrament-item">🎂 <b>DOB:</b> ${m.dob || '-'}</div>
+                                <div class="sacrament-item">🕊️ <b>Bap:</b> ${m.bap || '-'} ${m.bapPlace ? `(${m.bapPlace})` : ''}</div>
+                                <div class="sacrament-item">🍞 <b>Comm:</b> ${m.comm || '-'} ${m.commPlace ? `(${m.commPlace})` : ''}</div>
+                                <div class="sacrament-item">🔥 <b>Conf:</b> ${m.conf || '-'} ${m.confPlace ? `(${m.confPlace})` : ''}</div>
+                                <div class="sacrament-item">💍 <b>Wed:</b> ${m.mar || '-'} ${m.marPlace ? `(${m.marPlace})` : ''}</div>
+                                ${m.death ? `<div class="sacrament-item" style="color:#721c24;">✝ <b>Demise:</b> ${m.death}${m.deathPlace ? `(${m.deathPlace})` : ''}</div>` : ''}
+                            </div>
+                        </div>
+                    </div>`;
+            }).join('');
 
-  const photoUrlInput = document.getElementById('memberPhotoUrl').value.trim(); 
-  const finalMemberPhoto = photoUrlInput || temporaryMemberPhotoBase64; 
+            if(mList.length === 0) membersCardsHTML = `<p style="font-size:0.85rem; color:#777; font-style:italic;">No family members listed.</p>`;
 
-  const mData = { 
-    name: name, 
-    age: document.getElementById('mAge').value, 
-    dob: document.getElementById('mDob').value, 
-    work: document.getElementById('mWork').value, 
-    phone: document.getElementById('mPhone').value, 
-    bap: document.getElementById('mBap').value, 
-    bapPlace: document.getElementById('mBapPlace').value, 
-    comm: document.getElementById('mComm').value, 
-    commPlace: document.getElementById('mCommPlace').value, 
-    conf: document.getElementById('mConf').value, 
-    confPlace: document.getElementById('mConfPlace').value, 
-    mar: document.getElementById('mMar').value, 
-    marPlace: document.getElementById('mMarPlace').value, 
-    death: document.getElementById('mDeath').value, 
-    deathPlace: document.getElementById('mDeathPlace').value, 
-    photo: finalMemberPhoto 
-  }; 
+            const deleteButtonHTML = key ? `<button class="btn-delete" style="margin-top:10px;" onclick="deleteEntireFamilyRecord('${key}', '${family.fNo}')">🗑️ Delete Family Record</button>` : '';
 
-  if (editingMemberIndex > -1) { 
-    tempFamily.members[editingMemberIndex] = mData; 
-  } else { 
-    tempFamily.members.push(mData); 
-  } 
+            const locationButtonHTML = family.locationUrl ? `
+                <div style="margin-top: 10px;">
+                    <a href="${family.locationUrl}" target="_blank" style="display:inline-block; padding:10px 15px; background:#4285F4; color:white; text-decoration:none; border-radius:8px; font-weight:bold; font-size:0.85rem;">
+                        🗺️ Open Map & Navigate to House
+                    </a>
+                </div>
+            ` : '';
 
-  renderMembersList(); 
-  document.getElementById('memberForm').classList.add('hidden'); 
-} 
+            target.innerHTML = `
+                <div class="family-data-card">
+                    <div class="card-header">
+                        <h3 class="card-title">⛪ PARISHIONER DATA CARD</h3>
+                        <div class="card-id-badge">CARD NO: ${family.fNo}</div>
+                    </div>
+                    ${familyHeroHTML}
+                    <div class="card-info-box">
+                        <b>⛪ Anbiyam Unit (NBM):</b> ${family.anbiyam || 'Not Specified'}<br>
+                        <b>🏠 Address:</b> ${family.address || 'Not Added'}<br>
+                        ${locationButtonHTML}
+                    </div>
+                    <p style="font-size:0.8rem; font-weight:bold; color:var(--primary-velvet); margin:0 0 8px 0; text-transform:uppercase;">Family Members Registry Matrix</p>
+                    ${membersCardsHTML}
+                    ${deleteButtonHTML}
+                </div>`;
+        }
 
-function removeMemberFromTemp(index) { 
-  if (confirm("Remove this member from workspace list?")) { 
-    tempFamily.members.splice(index, 1); 
-    renderMembersList(); 
-  } 
-} 
+        function executeMasterSearch() {
+            const query = document.getElementById('adminSearchInput').value.toLowerCase().trim();
+            const displayDiv = document.getElementById('searchResults');
+            displayDiv.innerHTML = '';
 
-function renderMembersList() { 
-  const list = document.getElementById('membersList'); 
-  if (tempFamily.members.length === 0) { 
-    list.innerHTML = `<i style="color:#7f786a;">No individuals attached yet.</i>`; 
-    return; 
-  } 
-  list.innerHTML = tempFamily.members.map((m, idx) => ` 
-    <div class="member-row"> 
-      <div> 
-        <b>👤 ${m.name}</b> (${m.work || 'No Work Info'}) <br> 
-        <span style="font-size:0.75rem; color:#666;">Age: ${m.age || 'N/A'} | Phone: ${m.phone || 'N/A'}</span> 
-      </div> 
-      <div style="display:flex; gap:5px;"> 
-        <button style="width:auto; padding:4px 8px; font-size:0.75rem; margin:0; background:#3e517a;" onclick="editMember(${idx})">✏️ Edit</button> 
-        <button class="btn-delete" style="padding:4px 8px;" onclick="removeMemberFromTemp(${idx})">🗑️</button> 
-      </div> 
-    </div> 
-  `).join(''); 
-} 
+            if (!query) return alert("Please type a card number or search term.");
 
-function resetForm() { 
-  tempFamily = { members: [] }; 
-  temporaryMemberPhotoBase64 = ""; 
-  temporaryFamilyPhotoBase64 = ""; 
-  editingMemberIndex = -1; 
-  
-  document.querySelectorAll('#adminDashboard input').forEach(el => el.value = ''); 
-  document.getElementById('famPassword').value = 'Carmel'; 
-  document.getElementById('familyHeroPhotoPreview').style.display = 'none'; 
-  document.getElementById('memberPhotoPreview').style.display = 'none'; 
-  document.getElementById('memberForm').classList.add('hidden'); 
-  document.getElementById('activeCardDisplayZone').innerHTML = ''; 
-  document.getElementById('searchResults').innerHTML = ''; 
-  document.getElementById('analyticsOutput').innerHTML = ''; 
-  document.getElementById('eventsOutput').innerHTML = ''; 
-  document.getElementById('gpsStatus').innerText = ''; 
-  renderMembersList(); 
-} 
-</script> 
-</body> 
+            let matches = 0;
+            for (const key in masterDatabaseFile) {
+                const family = masterDatabaseFile[key];
+                let mList = Array.isArray(family.members) ? family.members : [];
+                if (typeof family.members === 'string') {
+                    try { mList = JSON.parse(family.members); } catch(e){}
+                }
+
+                let check = family.fNo.toLowerCase().includes(query) ||
+                            (family.anbiyam && family.anbiyam.toLowerCase().includes(query)) ||
+                            mList.some(m => m.name.toLowerCase().includes(query));
+
+                if (check) {
+                    matches++;
+                    displayDiv.innerHTML += `
+                        <div style="background:#fff; padding:10px; margin-top:8px; border-radius:6px; border:1px solid #cbd5e1; display:flex; justify-content:space-between; align-items:center;">
+                            <div><b>Card Key #${family.fNo}</b> (${family.anbiyam || 'General'})</div>
+                            <div>
+                                <button style="width:auto; padding:5px 10px; font-size:0.8rem; margin:0; background:#007bff;" onclick="loadFamilyIntoWorkspace('${key}')">✏️ Edit Card</button>
+                                <button class="btn-delete" style="padding:5px 8px;" onclick="deleteEntireFamilyRecord('${key}', '${family.fNo}')">🗑️</button>
+                            </div>
+                        </div>`;
+                }
+            }
+
+            if(matches === 0) displayDiv.innerHTML = `<p style="color:red; font-size:0.8rem; margin-top:5px;">No structural family record located.</p>`;
+        }
+
+        function loadFamilyIntoWorkspace(key) {
+            const family = masterDatabaseFile[key];
+            document.getElementById('fNo').value = family.fNo;
+            document.getElementById('anbiyamName').value = family.anbiyam || '';
+            document.getElementById('address').value = family.address || '';
+            document.getElementById('houseLocationUrl').value = family.locationUrl || '';
+
+            if (family.familyPhoto) {
+                if(family.familyPhoto.startsWith('http')) {
+                    document.getElementById('familyHeroPhotoUrl').value = family.familyPhoto;
+                }
+                document.getElementById('familyHeroPhotoPreview').src = family.familyPhoto;
+                document.getElementById('familyHeroPhotoPreview').style.display = 'block';
+                temporaryFamilyPhotoBase64 = family.familyPhoto;
+            } else {
+                document.getElementById('familyHeroPhotoPreview').style.display = 'none';
+                temporaryFamilyPhotoBase64 = "";
+            }
+
+            let mList = Array.isArray(family.members) ? family.members : [];
+            if (typeof family.members === 'string') {
+                try { mList = JSON.parse(family.members); } catch(e){}
+            }
+
+            tempFamily.members = mList;
+            renderMembersList();
+            generateVisualDisplayBox(family, 'activeCardDisplayZone', key);
+            document.getElementById('searchResults').innerHTML = '';
+            document.getElementById('adminSearchInput').value = '';
+            closeCounterDirectoryView();
+        }
+
+        function previewFamilyImage(uploader) {
+            const file = uploader.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('familyHeroPhotoPreview').src = e.target.result;
+                    document.getElementById('familyHeroPhotoPreview').style.display = 'block';
+                    temporaryFamilyPhotoBase64 = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function previewFamilyUrlImage(url) {
+            if(url.trim()) {
+                document.getElementById('familyHeroPhotoPreview').src = url;
+                document.getElementById('familyHeroPhotoPreview').style.display = 'block';
+            }
+        }
+
+        function previewImage(uploader, targetId) {
+            const file = uploader.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById(targetId).src = e.target.result;
+                    document.getElementById(targetId).style.display = 'block';
+                    temporaryMemberPhotoBase64 = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function previewUrlImage(url, targetId) {
+            if(url.trim()) {
+                document.getElementById(targetId).src = url;
+                document.getElementById(targetId).style.display = 'block';
+            }
+        }
+
+        function openMemberFormForNew() {
+            editingMemberIndex = -1;
+            document.getElementById('memberFormTitle').innerText = "👤 Individual Member Profile";
+            document.getElementById('memberForm').classList.remove('hidden');
+            document.querySelectorAll('#memberForm input').forEach(el => el.value = '');
+            document.getElementById('memberPhotoPreview').style.display = 'none';
+            temporaryMemberPhotoBase64 = "";
+        }
+
+        function editMember(index) {
+            editingMemberIndex = index;
+            const m = tempFamily.members[index];
+
+            document.getElementById('memberFormTitle').innerText = "✏️ Edit Member Profile";
+            document.getElementById('memberForm').classList.remove('hidden');
+
+            document.getElementById('mName').value = m.name || '';
+            document.getElementById('mAge').value = m.age || '';
+            document.getElementById('mDob').value = m.dob || '';
+            document.getElementById('mWork').value = m.work || '';
+            document.getElementById('mPhone').value = m.phone || '';
+
+            document.getElementById('mBap').value = m.bap || '';
+            document.getElementById('mBapPlace').value = m.bapPlace || '';
+            document.getElementById('mComm').value = m.comm || '';
+            document.getElementById('mCommPlace').value = m.commPlace || '';
+            document.getElementById('mConf').value = m.conf || '';
+            document.getElementById('mConfPlace').value = m.confPlace || '';
+            document.getElementById('mMar').value = m.mar || '';
+            document.getElementById('mMarPlace').value = m.marPlace || '';
+            document.getElementById('mDeath').value = m.death || '';
+            document.getElementById('mDeathPlace').value = m.deathPlace || '';
+
+            if (m.photo) {
+                if (m.photo.startsWith('http')) {
+                    document.getElementById('memberPhotoUrl').value = m.photo;
+                }
+                document.getElementById('memberPhotoPreview').src = m.photo;
+                document.getElementById('memberPhotoPreview').style.display = 'block';
+                temporaryMemberPhotoBase64 = m.photo;
+            } else {
+                document.getElementById('memberPhotoPreview').style.display = 'none';
+                temporaryMemberPhotoBase64 = "";
+            }
+        }
+
+        function saveMemberToTemp() {
+            const name = document.getElementById('mName').value.trim();
+            if(!name) return alert("Please enter the member's name.");
+
+            const photoUrlInput = document.getElementById('memberPhotoUrl').value.trim();
+            const finalMemberPhoto = photoUrlInput || temporaryMemberPhotoBase64;
+
+            const mData = {
+                name: name,
+                age: document.getElementById('mAge').value,
+                dob: document.getElementById('mDob').value,
+                work: document.getElementById('mWork').value,
+                phone: document.getElementById('mPhone').value,
+                bap: document.getElementById('mBap').value,
+                bapPlace: document.getElementById('mBapPlace').value,
+                comm: document.getElementById('mComm').value,
+                commPlace: document.getElementById('mCommPlace').value,
+                conf: document.getElementById('mConf').value,
+                confPlace: document.getElementById('mConfPlace').value,
+                mar: document.getElementById('mMar').value,
+                marPlace: document.getElementById('mMarPlace').value,
+                death: document.getElementById('mDeath').value,
+                deathPlace: document.getElementById('mDeathPlace').value,
+                photo: finalMemberPhoto
+            };
+
+            if (editingMemberIndex > -1) {
+                tempFamily.members[editingMemberIndex] = mData;
+            } else {
+                tempFamily.members.push(mData);
+            }
+
+            renderMembersList();
+            document.getElementById('memberForm').classList.add('hidden');
+        }
+
+        function removeMemberFromTemp(index) {
+            if (confirm("Remove this member from workspace list?")) {
+                tempFamily.members.splice(index, 1);
+                renderMembersList();
+            }
+        }
+
+        function renderMembersList() {
+            const list = document.getElementById('membersList');
+            if (tempFamily.members.length === 0) {
+                list.innerHTML = `<i style="color:#7f786a;">No individuals attached yet.</i>`;
+                return;
+            }
+
+            list.innerHTML = tempFamily.members.map((m, idx) => `
+                <div class="member-row">
+                    <div>
+                        <b>👤 ${m.name}</b> (${m.work || 'No Work Info'}) <br>
+                        <span style="font-size:0.75rem; color:#666;">Age: ${m.age || 'N/A'} | Phone: ${m.phone || 'N/A'}</span>
+                    </div>
+                    <div style="display:flex; gap:5px;">
+                        <button style="width:auto; padding:4px 8px; font-size:0.75rem; margin:0; background:#3e517a;" onclick="editMember(${idx})">✏️ Edit</button>
+                        <button class="btn-delete" style="padding:4px 8px;" onclick="removeMemberFromTemp(${idx})">🗑️</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function resetForm() {
+            tempFamily = { members: [] };
+            temporaryMemberPhotoBase64 = "";
+            temporaryFamilyPhotoBase64 = "";
+            editingMemberIndex = -1;
+
+            document.querySelectorAll('#adminDashboard input').forEach(el => el.value = '');
+            document.getElementById('familyHeroPhotoPreview').style.display = 'none';
+            document.getElementById('memberPhotoPreview').style.display = 'none';
+            document.getElementById('memberForm').classList.add('hidden');
+            document.getElementById('activeCardDisplayZone').innerHTML = '';
+            document.getElementById('searchResults').innerHTML = '';
+            document.getElementById('analyticsOutput').innerHTML = '';
+            document.getElementById('eventsOutput').innerHTML = '';
+            document.getElementById('gpsStatus').innerText = '';
+
+            renderMembersList();
+        }
+    </script>
+</body>
 </html>
-

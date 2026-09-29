@@ -388,7 +388,7 @@ button:hover { background: #5c161d; }
       <input type="file" id="importFileInput" class="hidden" accept=".json" onchange="importOfflineDataFile(event)"> 
     </div> 
     <button style="background: #adb5bd; margin-top: 8px; color: #333;" onclick="resetForm()">🔄 Clear Entry Workspace</button> 
-    <button style="background: #2d2d2d; margin-top: 8px;" onclick="location.reload()">🚪 Secure Exit Dashboard</button> 
+    <button style="background: #2d2d2d; margin-top: 8px;" onclick="logoutAdmin()">🚪 Secure Exit Dashboard</button> 
   </div> 
 
   <!-- PARISHIONER MEMBER PORTAL DISPLAY --> 
@@ -398,7 +398,7 @@ button:hover { background: #5c161d; }
       <h1 id="vTitle">Parish Record Card</h1> 
     </div> 
     <div id="vCardOutputZone"></div> 
-    <button style="background: #2d2d2d; margin-top: 20px;" onclick="location.reload()">🚪 Close Registry Viewer</button> 
+    <button style="background: #2d2d2d; margin-top: 20px;" onclick="logoutFamily()">🚪 Close Registry Viewer</button> 
   </div> 
 </div> 
 
@@ -421,6 +421,21 @@ window.addEventListener('DOMContentLoaded', () => {
       masterDatabaseFile = {}; 
     } 
   } 
+  
+  // Session Persistence Check
+  if (sessionStorage.getItem('OLMC_Admin_LoggedIn') === 'true') {
+    document.getElementById('loginScreen').classList.add('hidden');
+    document.getElementById('adminDashboard').classList.remove('hidden');
+  } else if (sessionStorage.getItem('OLMC_Family_LoggedIn')) {
+    const familyKey = sessionStorage.getItem('OLMC_Family_LoggedIn');
+    if (masterDatabaseFile[familyKey]) {
+      document.getElementById('loginScreen').classList.add('hidden');
+      document.getElementById('familyView').classList.remove('hidden');
+      document.getElementById('vTitle').innerText = "Parish Card: Family #" + masterDatabaseFile[familyKey].fNo;
+      generateVisualDisplayBox(masterDatabaseFile[familyKey], 'vCardOutputZone');
+    }
+  }
+
   fetchCloudDataOnLoad(); 
 }); 
 
@@ -1073,6 +1088,7 @@ function resetForm() {
 
 function handleAdminAuthentication() { 
   if(document.getElementById('adminSecretPass').value.trim() === "Carmel OCD") { 
+    sessionStorage.setItem('OLMC_Admin_LoggedIn', 'true');
     document.getElementById('loginScreen').classList.add('hidden'); 
     document.getElementById('adminDashboard').classList.remove('hidden'); 
     updateParishDashboardCounters(); 
@@ -1081,12 +1097,18 @@ function handleAdminAuthentication() {
   } 
 } 
 
+function logoutAdmin() {
+  sessionStorage.removeItem('OLMC_Admin_LoggedIn');
+  location.reload();
+}
+
 function handleFamilyLogin() { 
   const uid = document.getElementById('famUid').value.trim(); 
   const pwd = document.getElementById('famPwd').value.trim(); 
   for (const key in masterDatabaseFile) { 
     const family = masterDatabaseFile[key]; 
     if (family.loginId === uid && family.password === pwd) { 
+      sessionStorage.setItem('OLMC_Family_LoggedIn', key);
       document.getElementById('loginScreen').classList.add('hidden'); 
       document.getElementById('familyView').classList.remove('hidden'); 
       document.getElementById('vTitle').innerText = "Parish Card: Family #" + family.fNo; 
@@ -1096,6 +1118,11 @@ function handleFamilyLogin() {
   } 
   alert("No credentials match internal app store."); 
 } 
+
+function logoutFamily() {
+  sessionStorage.removeItem('OLMC_Family_LoggedIn');
+  location.reload();
+}
 
 document.getElementById('fNo').addEventListener('keyup', function() { 
   document.getElementById('famLoginId').value = this.value ? "MC " + this.value : ""; 

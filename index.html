@@ -398,6 +398,13 @@
         .hidden {
             display: none;
         }
+        
+        .upload-status {
+            font-size: 0.8rem;
+            font-weight: bold;
+            margin-top: 4px;
+            display: block;
+        }
     </style>
 </head>
 <body>
@@ -502,7 +509,7 @@
                 <div id="analyticsOutput" style="max-height: 250px; overflow-y: auto; margin-top: 5px;"></div>
             </div>
 
-            <!-- SEARCH SYSTEM (ENHANCED MULTI-FIELD SEARCH) -->
+            <!-- SEARCH SYSTEM -->
             <div class="panel-box" style="background: #fffcf0; border-top-color: var(--gold-accent);">
                 <label style="color: var(--primary-velvet); font-weight: bold;">🔎 Master Directory Search</label>
                 <div style="display: flex; gap: 8px; margin-top: 5px;">
@@ -518,9 +525,10 @@
             <!-- 1. ONLY FAMILY DETAILS SECTION -->
             <h3 class="section-title">🏡 Family Basic Details</h3>
             <div class="form-group">
-                <label>🖼️ Family Photo (Upload File or Paste Image URL)</label>
-                <input type="file" id="familyHeroPhotoInput" accept="image/*" onchange="previewFamilyImage(this)">
-                <input type="text" id="familyHeroPhotoUrl" placeholder="Or paste image web link..." style="margin-top: 5px;" onchange="previewFamilyUrlImage(this.value)">
+                <label>🖼️ Family Photo (Select file - Auto Converts to Web Link / URL)</label>
+                <input type="file" id="familyHeroPhotoInput" accept="image/*" onchange="uploadAndConvertImage(this, 'familyHeroPhotoUrl', 'familyHeroPhotoPreview', 'familyUploadStatus')">
+                <span id="familyUploadStatus" class="upload-status"></span>
+                <input type="text" id="familyHeroPhotoUrl" placeholder="Image Web URL will appear here automatically..." style="margin-top: 5px;" onchange="previewFamilyUrlImage(this.value)">
                 <img id="familyHeroPhotoPreview" class="family-img-preview" alt="Family Portrait Preview">
             </div>
 
@@ -551,9 +559,10 @@
                 <h4 id="memberFormTitle" style="margin: 0 0 12px 0; color: var(--primary-velvet); font-weight: bold;">👤 Individual Member Profile</h4>
                 
                 <div class="form-group">
-                    <label>🖼️ Profile Photo (Upload or Paste Link)</label>
-                    <input type="file" id="memberPhotoInput" accept="image/*" onchange="previewImage(this, 'memberPhotoPreview')">
-                    <input type="text" id="memberPhotoUrl" placeholder="Or paste photo web link..." style="margin-top: 5px;" onchange="previewUrlImage(this.value, 'memberPhotoPreview')">
+                    <label>🖼️ Profile Photo (Select file - Auto Converts to Web Link / URL)</label>
+                    <input type="file" id="memberPhotoInput" accept="image/*" onchange="uploadAndConvertImage(this, 'memberPhotoUrl', 'memberPhotoPreview', 'memberUploadStatus')">
+                    <span id="memberUploadStatus" class="upload-status"></span>
+                    <input type="text" id="memberPhotoUrl" placeholder="Image Web URL will appear here automatically..." style="margin-top: 5px;" onchange="previewUrlImage(this.value, 'memberPhotoPreview')">
                     <img id="memberPhotoPreview" class="img-preview" alt="Preview">
                 </div>
 
@@ -632,6 +641,8 @@
 
     <script>
         const CLOUD_API_GATEWAY_URL = "https://script.google.com/macros/s/AKfycbzjMGz7XFNRF3DXNLQNo_bRaeCHrCOs91rqw4GMAenA1ToO-V_7A11SioTPAEvYc6RqRA/exec";
+        const IMGBB_API_KEY = "3b0821b333917a1dfa52b1ec31dbda0e"; // Automatic Free Image-to-URL Cloud Storage
+
         let masterDatabaseFile = {};
         let tempFamily = { members: [] };
         let temporaryMemberPhotoBase64 = "";
@@ -650,6 +661,46 @@
             }
             fetchCloudDataOnLoad();
         });
+
+        // AUTOMATIC IMAGE TO WEB URL CONVERTER FUNCTION
+        async function uploadAndConvertImage(fileInput, urlFieldId, previewImgId, statusSpanId) {
+            const file = fileInput.files[0];
+            const statusEl = document.getElementById(statusSpanId);
+            const urlInput = document.getElementById(urlFieldId);
+            const previewImg = document.getElementById(previewImgId);
+
+            if (!file) return;
+
+            statusEl.innerText = "⏳ புகைப் படம் Cloud-க்கு பதிவேற்றப்பட்டு URL-ஆக மாறுகிறது...";
+            statusEl.style.color = "#d97706";
+
+            const formData = new FormData();
+            formData.append("image", file);
+
+            try {
+                const response = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, {
+                    method: "POST",
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    const imageUrl = data.data.url;
+                    urlInput.value = imageUrl;
+                    previewImg.src = imageUrl;
+                    previewImg.style.display = "block";
+                    statusEl.innerText = "✅ புகைப்படம் வெற்றிகரமாக Web URL-ஆக மாற்றப்பட்டது!";
+                    statusEl.style.color = "#16a34a";
+                } else {
+                    throw new Error("Upload failed");
+                }
+            } catch (error) {
+                console.error("Image Upload Error:", error);
+                statusEl.innerText = "⚠️ Upload தோல்வி. நேரடியாக Image URL-ஐ பேஸ்ட் செய்யலாம்.";
+                statusEl.style.color = "#dc2626";
+            }
+        }
 
         async function fetchCloudDataOnLoad() {
             const statusText = document.getElementById('storageStatusText');
@@ -999,24 +1050,21 @@
             outDiv.innerHTML = `<div style="background:#e6f4ea; color:#137333; padding:8px; border-radius:6px; font-weight:bold; font-size:0.85rem; margin-bottom:8px;">📊 Count Total: ${matchingPeople.length} Parishioners Located</div>${rowsHTML}`;
         }
 
-        // SAVE & UPDATE FUNCTION WITH PROPER REPLACEMENT LOGIC
         function saveFamilyToMemoryBundle() {
             const serialNo = document.getElementById('fNo').value.trim();
             if(!serialNo) return alert("Family Card Number tracking key missing!");
 
             const photoUrlInput = document.getElementById('familyHeroPhotoUrl').value.trim();
-            const finalFamilyPhoto = photoUrlInput || temporaryFamilyPhotoBase64;
 
             const familyObject = {
                 fNo: serialNo,
                 anbiyam: document.getElementById('anbiyamName').value,
                 address: document.getElementById('address').value,
                 locationUrl: document.getElementById('houseLocationUrl').value,
-                familyPhoto: finalFamilyPhoto,
+                familyPhoto: photoUrlInput,
                 members: tempFamily.members
             };
 
-            // Updates existing record or creates a new one
             masterDatabaseFile['church_family_' + serialNo] = familyObject;
 
             try {
@@ -1034,10 +1082,10 @@
                     .catch(err => console.error("Cloud Sync Error:", err));
                 }
 
-                alert(`🎉 Success! Family Card #${serialNo} updated/saved cleanly in App & Auto-Synced to Cloud!`);
+                alert(`🎉 Success! Family Card #${serialNo} saved smoothly via Cloud Web Links!`);
                 resetForm();
             } catch(e) {
-                alert("⚠️ Storage Warning: Large direct images attached.");
+                alert("⚠️ Storage Error: Try uploading lighter images.");
             }
         }
 
@@ -1126,7 +1174,6 @@
                 </div>`;
         }
 
-        // ENHANCED MASTER SEARCH FUNCTION (Name, Anbiyam, Work, Address, Card No, Demise/Death)
         function executeMasterSearch() {
             const query = document.getElementById('adminSearchInput').value.toLowerCase().trim();
             const displayDiv = document.getElementById('searchResults');
@@ -1187,15 +1234,12 @@
             document.getElementById('houseLocationUrl').value = family.locationUrl || '';
 
             if (family.familyPhoto) {
-                if(family.familyPhoto.startsWith('http')) {
-                    document.getElementById('familyHeroPhotoUrl').value = family.familyPhoto;
-                }
+                document.getElementById('familyHeroPhotoUrl').value = family.familyPhoto;
                 document.getElementById('familyHeroPhotoPreview').src = family.familyPhoto;
                 document.getElementById('familyHeroPhotoPreview').style.display = 'block';
-                temporaryFamilyPhotoBase64 = family.familyPhoto;
             } else {
+                document.getElementById('familyHeroPhotoUrl').value = '';
                 document.getElementById('familyHeroPhotoPreview').style.display = 'none';
-                temporaryFamilyPhotoBase64 = "";
             }
 
             let mList = Array.isArray(family.members) ? family.members : [];
@@ -1213,36 +1257,10 @@
             window.scrollTo({ top: document.getElementById('fNo').offsetTop - 100, behavior: 'smooth' });
         }
 
-        function previewFamilyImage(uploader) {
-            const file = uploader.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    document.getElementById('familyHeroPhotoPreview').src = e.target.result;
-                    document.getElementById('familyHeroPhotoPreview').style.display = 'block';
-                    temporaryFamilyPhotoBase64 = e.target.result;
-                };
-                reader.readAsDataURL(file);
-            }
-        }
-
         function previewFamilyUrlImage(url) {
             if(url.trim()) {
                 document.getElementById('familyHeroPhotoPreview').src = url;
                 document.getElementById('familyHeroPhotoPreview').style.display = 'block';
-            }
-        }
-
-        function previewImage(uploader, targetId) {
-            const file = uploader.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    document.getElementById(targetId).src = e.target.result;
-                    document.getElementById(targetId).style.display = 'block';
-                    temporaryMemberPhotoBase64 = e.target.result;
-                };
-                reader.readAsDataURL(file);
             }
         }
 
@@ -1259,7 +1277,7 @@
             document.getElementById('memberForm').classList.remove('hidden');
             document.querySelectorAll('#memberForm input').forEach(el => el.value = '');
             document.getElementById('memberPhotoPreview').style.display = 'none';
-            temporaryMemberPhotoBase64 = "";
+            document.getElementById('memberUploadStatus').innerText = '';
         }
 
         function editMember(index) {
@@ -1287,16 +1305,14 @@
             document.getElementById('mDeathPlace').value = m.deathPlace || '';
 
             if (m.photo) {
-                if (m.photo.startsWith('http')) {
-                    document.getElementById('memberPhotoUrl').value = m.photo;
-                }
+                document.getElementById('memberPhotoUrl').value = m.photo;
                 document.getElementById('memberPhotoPreview').src = m.photo;
                 document.getElementById('memberPhotoPreview').style.display = 'block';
-                temporaryMemberPhotoBase64 = m.photo;
             } else {
+                document.getElementById('memberPhotoUrl').value = '';
                 document.getElementById('memberPhotoPreview').style.display = 'none';
-                temporaryMemberPhotoBase64 = "";
             }
+            document.getElementById('memberUploadStatus').innerText = '';
         }
 
         function saveMemberToTemp() {
@@ -1304,7 +1320,6 @@
             if(!name) return alert("Please enter the member's name.");
 
             const photoUrlInput = document.getElementById('memberPhotoUrl').value.trim();
-            const finalMemberPhoto = photoUrlInput || temporaryMemberPhotoBase64;
 
             const mData = {
                 name: name,
@@ -1322,7 +1337,7 @@
                 marPlace: document.getElementById('mMarPlace').value,
                 death: document.getElementById('mDeath').value,
                 deathPlace: document.getElementById('mDeathPlace').value,
-                photo: finalMemberPhoto
+                photo: photoUrlInput
             };
 
             if (editingMemberIndex > -1) {
@@ -1365,13 +1380,13 @@
 
         function resetForm() {
             tempFamily = { members: [] };
-            temporaryMemberPhotoBase64 = "";
-            temporaryFamilyPhotoBase64 = "";
             editingMemberIndex = -1;
 
             document.querySelectorAll('#adminDashboard input').forEach(el => el.value = '');
             document.getElementById('familyHeroPhotoPreview').style.display = 'none';
             document.getElementById('memberPhotoPreview').style.display = 'none';
+            document.getElementById('familyUploadStatus').innerText = '';
+            document.getElementById('memberUploadStatus').innerText = '';
             document.getElementById('memberForm').classList.add('hidden');
             document.getElementById('activeCardDisplayZone').innerHTML = '';
             document.getElementById('searchResults').innerHTML = '';

@@ -502,11 +502,11 @@
                 <div id="analyticsOutput" style="max-height: 250px; overflow-y: auto; margin-top: 5px;"></div>
             </div>
 
-            <!-- SEARCH SYSTEM -->
+            <!-- SEARCH SYSTEM (ENHANCED MULTI-FIELD SEARCH) -->
             <div class="panel-box" style="background: #fffcf0; border-top-color: var(--gold-accent);">
                 <label style="color: var(--primary-velvet); font-weight: bold;">🔎 Master Directory Search</label>
                 <div style="display: flex; gap: 8px; margin-top: 5px;">
-                    <input type="text" id="adminSearchInput" placeholder="Search by names or family IDs...">
+                    <input type="text" id="adminSearchInput" placeholder="பெயர், அன்பியம், வேலை, கார்டு எண், 'demise' / 'death' தேடவும்...">
                     <button style="width: auto; padding: 0 15px; background: #3e517a;" onclick="executeMasterSearch()">🔍 Search</button>
                 </div>
                 <div id="searchResults"></div>
@@ -999,6 +999,7 @@
             outDiv.innerHTML = `<div style="background:#e6f4ea; color:#137333; padding:8px; border-radius:6px; font-weight:bold; font-size:0.85rem; margin-bottom:8px;">📊 Count Total: ${matchingPeople.length} Parishioners Located</div>${rowsHTML}`;
         }
 
+        // SAVE & UPDATE FUNCTION WITH PROPER REPLACEMENT LOGIC
         function saveFamilyToMemoryBundle() {
             const serialNo = document.getElementById('fNo').value.trim();
             if(!serialNo) return alert("Family Card Number tracking key missing!");
@@ -1015,6 +1016,7 @@
                 members: tempFamily.members
             };
 
+            // Updates existing record or creates a new one
             masterDatabaseFile['church_family_' + serialNo] = familyObject;
 
             try {
@@ -1032,7 +1034,7 @@
                     .catch(err => console.error("Cloud Sync Error:", err));
                 }
 
-                alert(`🎉 Success! Family Card #${serialNo} saved in App & Auto-Synced to Cloud Sheet!`);
+                alert(`🎉 Success! Family Card #${serialNo} updated/saved cleanly in App & Auto-Synced to Cloud!`);
                 resetForm();
             } catch(e) {
                 alert("⚠️ Storage Warning: Large direct images attached.");
@@ -1124,14 +1126,17 @@
                 </div>`;
         }
 
+        // ENHANCED MASTER SEARCH FUNCTION (Name, Anbiyam, Work, Address, Card No, Demise/Death)
         function executeMasterSearch() {
             const query = document.getElementById('adminSearchInput').value.toLowerCase().trim();
             const displayDiv = document.getElementById('searchResults');
             displayDiv.innerHTML = '';
 
-            if (!query) return alert("Please type a card number or search term.");
+            if (!query) return alert("தேடுவதற்கு ஏதேனும் ஒன்றை தட்டச்சு செய்யவும் (Name, Anbiyam, Profession, Demise, Card No).");
 
             let matches = 0;
+            const isDemiseSearch = ['demise', 'death', 'இறப்பு', 'இறந்தவர்'].includes(query);
+
             for (const key in masterDatabaseFile) {
                 const family = masterDatabaseFile[key];
                 let mList = Array.isArray(family.members) ? family.members : [];
@@ -1139,15 +1144,30 @@
                     try { mList = JSON.parse(family.members); } catch(e){}
                 }
 
-                let check = family.fNo.toLowerCase().includes(query) ||
+                let check = false;
+
+                if (isDemiseSearch) {
+                    check = mList.some(m => m.death && m.death.trim() !== "");
+                } else {
+                    check = (family.fNo && family.fNo.toLowerCase().includes(query)) ||
                             (family.anbiyam && family.anbiyam.toLowerCase().includes(query)) ||
-                            mList.some(m => m.name.toLowerCase().includes(query));
+                            (family.address && family.address.toLowerCase().includes(query)) ||
+                            mList.some(m => 
+                                (m.name && m.name.toLowerCase().includes(query)) ||
+                                (m.work && m.work.toLowerCase().includes(query)) ||
+                                (m.phone && m.phone.toLowerCase().includes(query)) ||
+                                (m.deathPlace && m.deathPlace.toLowerCase().includes(query))
+                            );
+                }
 
                 if (check) {
                     matches++;
                     displayDiv.innerHTML += `
                         <div style="background:#fff; padding:10px; margin-top:8px; border-radius:6px; border:1px solid #cbd5e1; display:flex; justify-content:space-between; align-items:center;">
-                            <div><b>Card Key #${family.fNo}</b> (${family.anbiyam || 'General'})</div>
+                            <div>
+                                <b>Card Key #${family.fNo}</b> (${family.anbiyam || 'General'})<br>
+                                <span style="font-size:0.75rem; color:#555;">Address: ${family.address || 'N/A'}</span>
+                            </div>
                             <div>
                                 <button style="width:auto; padding:5px 10px; font-size:0.8rem; margin:0; background:#007bff;" onclick="loadFamilyIntoWorkspace('${key}')">✏️ Edit Card</button>
                                 <button class="btn-delete" style="padding:5px 8px;" onclick="deleteEntireFamilyRecord('${key}', '${family.fNo}')">🗑️</button>
@@ -1156,7 +1176,7 @@
                 }
             }
 
-            if(matches === 0) displayDiv.innerHTML = `<p style="color:red; font-size:0.8rem; margin-top:5px;">No structural family record located.</p>`;
+            if(matches === 0) displayDiv.innerHTML = `<p style="color:red; font-size:0.8rem; margin-top:5px;">தகவல்கள் எதுவும் கிடைக்கவில்லை (No matching records found).</p>`;
         }
 
         function loadFamilyIntoWorkspace(key) {
@@ -1189,6 +1209,8 @@
             document.getElementById('searchResults').innerHTML = '';
             document.getElementById('adminSearchInput').value = '';
             closeCounterDirectoryView();
+            
+            window.scrollTo({ top: document.getElementById('fNo').offsetTop - 100, behavior: 'smooth' });
         }
 
         function previewFamilyImage(uploader) {

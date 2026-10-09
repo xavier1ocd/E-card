@@ -568,8 +568,9 @@
 
                 <div class="form-row">
                     <div class="form-group"><label>Full Sacramental Name</label><input type="text" id="mName"></div>
-                    <div class="form-group"><label>Age</label><input type="number" id="mAge"></div>
-                    <div class="form-group"><label>Date of Birth (Birthday)</label><input type="date" id="mDob"></div>
+                    <!-- AUTOMATIC AGE FIELD -->
+                    <div class="form-group"><label>Date of Birth (Birthday)</label><input type="date" id="mDob" onchange="calculateAutoAgeFromDob(this.value)"></div>
+                    <div class="form-group"><label>Age (Auto-Calculated ⚡)</label><input type="number" id="mAge" placeholder="DOB போட்டவுடன் தானாக வரும்" readonly style="background:#e9ecef;"></div>
                 </div>
 
                 <div class="form-row">
@@ -659,6 +660,27 @@
             fetchCloudDataOnLoad();
         });
 
+        // ⚡ AUTOMATIC AGE CALCULATOR FUNCTION FROM DOB
+        function computeAgeFromDOB(dobString) {
+            if (!dobString) return '';
+            const birthDate = new Date(dobString);
+            if (isNaN(birthDate.getTime())) return '';
+            
+            const today = new Date();
+            let age = today.getFullYear() - birthDate.getFullYear();
+            const monthDiff = today.getMonth() - birthDate.getMonth();
+            
+            if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+                age--;
+            }
+            return age >= 0 ? age : '';
+        }
+
+        function calculateAutoAgeFromDob(dobValue) {
+            const calculatedAge = computeAgeFromDOB(dobValue);
+            document.getElementById('mAge').value = calculatedAge;
+        }
+
         // 🔒 SAFE OFFLINE IMAGE COMPRESSOR & URL CONVERTER (No external API)
         function processImageSafely(fileInput, urlFieldId, previewImgId, statusSpanId) {
             const file = fileInput.files[0];
@@ -675,11 +697,10 @@
             reader.onload = function(event) {
                 const img = new Image();
                 img.onload = function() {
-                    // Create an HTML5 Canvas to resize and compress image locally
                     const canvas = document.createElement('canvas');
                     let width = img.width;
                     let height = img.height;
-                    const max_size = 500; // Resize to maximum 500px to keep string small
+                    const max_size = 500;
 
                     if (width > height) {
                         if (width > max_size) {
@@ -698,7 +719,6 @@
                     const ctx = canvas.getContext('2d');
                     ctx.drawImage(img, 0, 0, width, height);
 
-                    // Convert to high-efficiency Data URL (JPEG format at 70% quality)
                     const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
 
                     urlInput.value = dataUrl;
@@ -857,7 +877,9 @@
                     try { mList = JSON.parse(fam.members); } catch(e){}
                 }
                 mList.forEach(m => {
-                    allMembers.push({ ...m, familyNo: fam.fNo, anbiyam: fam.anbiyam });
+                    // Dynamic live age calculation for directory
+                    const dynamicAge = m.dob ? computeAgeFromDOB(m.dob) : (m.age || 'N/A');
+                    allMembers.push({ ...m, liveAge: dynamicAge, familyNo: fam.fNo, anbiyam: fam.anbiyam });
                 });
             }
 
@@ -869,7 +891,7 @@
             allMembers.forEach(m => {
                 listContainer.innerHTML += `
                     <div style="background:#f8f9fa; border:1px solid #cbd5e1; border-radius:6px; padding:8px; margin-bottom:6px;">
-                        <b>👤 ${m.name}</b> (Age: ${m.age || 'N/A'})<br>
+                        <b>👤 ${m.name}</b> (Age: ${m.liveAge})<br>
                         <span style="font-size:0.75rem; color:#555;">Family Card Key: <b>#${m.familyNo}</b> | Unit: <b>${m.anbiyam || 'N/A'}</b></span>
                     </div>`;
             });
@@ -1034,7 +1056,9 @@
                 }
 
                 mList.forEach(m => {
-                    const ageNum = parseInt(m.age, 10);
+                    // Use live age for analytics filtering
+                    const liveAgeVal = m.dob ? computeAgeFromDOB(m.dob) : parseInt(m.age, 10);
+                    const ageNum = parseInt(liveAgeVal, 10);
                     if (!isNaN(ageNum) && ageNum >= minAge && ageNum <= maxAge) {
                         matchingPeople.push({
                             name: m.name,
@@ -1137,12 +1161,15 @@
 
             let membersCardsHTML = mList.map(m => {
                 const avatarSrc = m.photo || "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 24 24' fill='%23ccc'><path d='M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z'/></svg>";
+                // Compute live current age dynamically for display card
+                const liveAge = m.dob ? computeAgeFromDOB(m.dob) : (m.age || 'N/A');
+
                 return `
                     <div class="visual-member-card">
                         <img src="${avatarSrc}" class="member-avatar" alt="Avatar">
                         <div class="member-details">
                             <p class="member-name-heading">${m.name}</p>
-                            <span style="font-size:0.8rem; color:#555;">Age: <b>${m.age || 'N/A'}</b> | Vocation: <b>${m.work || '-'}</b></span>
+                            <span style="font-size:0.8rem; color:#555;">Age: <b>${liveAge}</b> | Vocation: <b>${m.work || '-'}</b></span>
                             <div class="sacramental-grid">
                                 <div class="sacrament-item">🎂 <b>DOB:</b> ${m.dob || '-'}</div>
                                 <div class="sacrament-item">🕊️ <b>Bap:</b> ${m.bap || '-'} ${m.bapPlace ? `(${m.bapPlace})` : ''}</div>
@@ -1299,8 +1326,12 @@
             document.getElementById('memberForm').classList.remove('hidden');
 
             document.getElementById('mName').value = m.name || '';
-            document.getElementById('mAge').value = m.age || '';
             document.getElementById('mDob').value = m.dob || '';
+            
+            // Auto-calculate live current age on edit
+            const currentLiveAge = m.dob ? computeAgeFromDOB(m.dob) : (m.age || '');
+            document.getElementById('mAge').value = currentLiveAge;
+
             document.getElementById('mWork').value = m.work || '';
             document.getElementById('mPhone').value = m.phone || '';
 
@@ -1331,11 +1362,13 @@
             if(!name) return alert("Please enter the member's name.");
 
             const photoUrlInput = document.getElementById('memberPhotoUrl').value.trim();
+            const dobVal = document.getElementById('mDob').value;
+            const liveAgeVal = dobVal ? computeAgeFromDOB(dobVal) : document.getElementById('mAge').value;
 
             const mData = {
                 name: name,
-                age: document.getElementById('mAge').value,
-                dob: document.getElementById('mDob').value,
+                dob: dobVal,
+                age: liveAgeVal,
                 work: document.getElementById('mWork').value,
                 phone: document.getElementById('mPhone').value,
                 bap: document.getElementById('mBap').value,
@@ -1375,18 +1408,20 @@
                 return;
             }
 
-            list.innerHTML = tempFamily.members.map((m, idx) => `
+            list.innerHTML = tempFamily.members.map((m, idx) => {
+                const displayAge = m.dob ? computeAgeFromDOB(m.dob) : (m.age || 'N/A');
+                return `
                 <div class="member-row">
                     <div>
                         <b>👤 ${m.name}</b> (${m.work || 'No Work Info'}) <br>
-                        <span style="font-size:0.75rem; color:#666;">Age: ${m.age || 'N/A'} | Phone: ${m.phone || 'N/A'}</span>
+                        <span style="font-size:0.75rem; color:#666;">Age: ${displayAge} | Phone: ${m.phone || 'N/A'}</span>
                     </div>
                     <div style="display:flex; gap:5px;">
                         <button style="width:auto; padding:4px 8px; font-size:0.75rem; margin:0; background:#3e517a;" onclick="editMember(${idx})">✏️ Edit</button>
                         <button class="btn-delete" style="padding:4px 8px;" onclick="removeMemberFromTemp(${idx})">🗑️</button>
                     </div>
-                </div>
-            `).join('');
+                </div>`;
+            }).join('');
         }
 
         function resetForm() {

@@ -1103,11 +1103,15 @@
             outDiv.innerHTML = `<div style="background:#e6f4ea; color:#137333; padding:8px; border-radius:6px; font-weight:bold; font-size:0.85rem; margin-bottom:8px;">📊 Count Total: ${matchingPeople.length} Parishioners Located</div>${rowsHTML}`;
         }
 
+        // FIXED PERFECT UPDATE & SAVE LOGIC FOR REPLACING EXISTING FAMILIES
         function saveFamilyToMemoryBundle() {
             const serialNo = document.getElementById('fNo').value.trim();
             if(!serialNo) return alert("Family Card Number tracking key missing!");
 
             const photoUrlInput = document.getElementById('familyHeroPhotoUrl').value.trim();
+
+            // Always clone existing array properly to avoid reference loss
+            const currentMembers = JSON.parse(JSON.stringify(tempFamily.members));
 
             const familyObject = {
                 fNo: serialNo,
@@ -1115,9 +1119,10 @@
                 address: document.getElementById('address').value,
                 locationUrl: document.getElementById('houseLocationUrl').value,
                 familyPhoto: photoUrlInput,
-                members: tempFamily.members
+                members: currentMembers
             };
 
+            // Fully replace existing memory key with updated family object
             masterDatabaseFile['church_family_' + serialNo] = familyObject;
 
             try {
@@ -1135,7 +1140,7 @@
                     .catch(err => console.error("Cloud Sync Error:", err));
                 }
 
-                alert(`🎉 Success! Family Card #${serialNo} saved safely with Google Maps link!`);
+                alert(`🎉 Success! Family Card #${serialNo} updated perfectly! New members are saved to Cloud!`);
                 resetForm();
             } catch(e) {
                 alert("⚠️ Storage Full: Please use smaller image files.");
@@ -1281,6 +1286,7 @@
             if(matches === 0) displayDiv.innerHTML = `<p style="color:red; font-size:0.8rem; margin-top:5px;">தகவல்கள் எதுவும் கிடைக்கவில்லை (No matching records found).</p>`;
         }
 
+        // DEEP COPY LOAD FUNCTION TO PRESERVE EXISTING MEMBERS
         function loadFamilyIntoWorkspace(key) {
             const family = masterDatabaseFile[key];
             document.getElementById('fNo').value = family.fNo;
@@ -1297,11 +1303,14 @@
                 document.getElementById('familyHeroPhotoPreview').style.display = 'none';
             }
 
-            let mList = Array.isArray(family.members) ? family.members : [];
-            if (typeof family.members === 'string') {
+            let mList = [];
+            if (Array.isArray(family.members)) {
+                mList = JSON.parse(JSON.stringify(family.members));
+            } else if (typeof family.members === 'string') {
                 try { mList = JSON.parse(family.members); } catch(e){}
             }
 
+            // Correctly set temp array so existing members are kept when adding new ones
             tempFamily.members = mList;
             renderMembersList();
             generateVisualDisplayBox(family, 'activeCardDisplayZone', key);

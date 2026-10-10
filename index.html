@@ -395,6 +395,22 @@
             background: #a71d2a;
         }
 
+        .btn-remove-img {
+            background: #e67e22;
+            color: white;
+            padding: 6px 10px;
+            border-radius: 6px;
+            border: none;
+            font-size: 0.75rem;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 5px;
+        }
+
+        .btn-remove-img:hover {
+            background: #cf6d17;
+        }
+
         .hidden {
             display: none;
         }
@@ -530,6 +546,7 @@
                 <span id="familyUploadStatus" class="upload-status"></span>
                 <input type="text" id="familyHeroPhotoUrl" placeholder="Web Data URL will be generated locally..." style="margin-top: 5px;" onchange="previewFamilyUrlImage(this.value)">
                 <img id="familyHeroPhotoPreview" class="family-img-preview" alt="Family Portrait Preview">
+                <button type="button" class="btn-remove-img" onclick="removeFamilyPhoto()">❌ Remove Family Photo</button>
             </div>
 
             <div class="form-row">
@@ -537,13 +554,11 @@
                 <div class="form-group"><label>Anbiyam Unit Name (NBM)</label><input type="text" id="anbiyamName" placeholder="e.g. Saint Xavier"></div>
             </div>
 
-            <!-- ENHANCED DETAILED ADDRESS FIELD WITH AUTO GPS GENERATION -->
             <div class="form-group">
                 <label>🏠 Full House Address (வீட்டு எண், தெரு, ஊர், மாவட்டம், பின்கோடு)</label>
                 <input type="text" id="address" placeholder="எ.கா: 12/A, கோவில் தெரு, Vandavasi, Tiruvannamalai - 604408" oninput="autoGenerateMapGpsLink(this.value)">
             </div>
 
-            <!-- AUTOMATIC GPS LOCATION CAPTURE / ADDRESS CONVERSION FIELD -->
             <div class="form-group">
                 <label>📍 House Location GPS (Auto Map Link from Address)</label>
                 <div style="display: flex; gap: 8px;">
@@ -568,11 +583,11 @@
                     <span id="memberUploadStatus" class="upload-status"></span>
                     <input type="text" id="memberPhotoUrl" placeholder="Web Data URL will be generated locally..." style="margin-top: 5px;" onchange="previewUrlImage(this.value, 'memberPhotoPreview')">
                     <img id="memberPhotoPreview" class="img-preview" alt="Preview">
+                    <button type="button" class="btn-remove-img" onclick="removeMemberPhoto()">❌ Remove Member Photo</button>
                 </div>
 
                 <div class="form-row">
                     <div class="form-group"><label>Full Sacramental Name</label><input type="text" id="mName"></div>
-                    <!-- AUTOMATIC AGE FIELD -->
                     <div class="form-group"><label>Date of Birth (Birthday)</label><input type="date" id="mDob" onchange="calculateAutoAgeFromDob(this.value)"></div>
                     <div class="form-group"><label>Age (Auto-Calculated ⚡)</label><input type="number" id="mAge" placeholder="DOB போட்டவுடன் தானாக வரும்" readonly style="background:#e9ecef;"></div>
                 </div>
@@ -664,7 +679,24 @@
             fetchCloudDataOnLoad();
         });
 
-        // 🗺️ AUTO GENERATE GOOGLE MAPS GPS LINK FROM TYPED FULL ADDRESS
+        // ❌ REMOVE FAMILY PHOTO FUNCTION
+        function removeFamilyPhoto() {
+            document.getElementById('familyHeroPhotoUrl').value = '';
+            document.getElementById('familyHeroPhotoPreview').src = '';
+            document.getElementById('familyHeroPhotoPreview').style.display = 'none';
+            document.getElementById('familyUploadStatus').innerText = ' படம் நீக்கப்பட்டது.';
+            document.getElementById('familyUploadStatus').style.color = '#dc2626';
+        }
+
+        // ❌ REMOVE MEMBER PHOTO FUNCTION
+        function removeMemberPhoto() {
+            document.getElementById('memberPhotoUrl').value = '';
+            document.getElementById('memberPhotoPreview').src = '';
+            document.getElementById('memberPhotoPreview').style.display = 'none';
+            document.getElementById('memberUploadStatus').innerText = ' சுயவிவரப் படம் நீக்கப்பட்டது.';
+            document.getElementById('memberUploadStatus').style.color = '#dc2626';
+        }
+
         function autoGenerateMapGpsLink(addressText) {
             const statusText = document.getElementById('gpsStatus');
             const gpsField = document.getElementById('houseLocationUrl');
@@ -680,7 +712,6 @@
             }
         }
 
-        // ⚡ AUTOMATIC AGE CALCULATOR FUNCTION FROM DOB
         function computeAgeFromDOB(dobString) {
             if (!dobString) return '';
             const birthDate = new Date(dobString);
@@ -701,7 +732,6 @@
             document.getElementById('mAge').value = calculatedAge;
         }
 
-        // 🔒 SAFE OFFLINE IMAGE COMPRESSOR & URL CONVERTER
         function processImageSafely(fileInput, urlFieldId, previewImgId, statusSpanId) {
             const file = fileInput.files[0];
             const statusEl = document.getElementById(statusSpanId);
@@ -1103,14 +1133,12 @@
             outDiv.innerHTML = `<div style="background:#e6f4ea; color:#137333; padding:8px; border-radius:6px; font-weight:bold; font-size:0.85rem; margin-bottom:8px;">📊 Count Total: ${matchingPeople.length} Parishioners Located</div>${rowsHTML}`;
         }
 
-        // FIXED PERFECT UPDATE & SAVE LOGIC FOR REPLACING EXISTING FAMILIES
+        // PERFECT SAVE & CLOUD UPDATER FUNCTION
         function saveFamilyToMemoryBundle() {
             const serialNo = document.getElementById('fNo').value.trim();
             if(!serialNo) return alert("Family Card Number tracking key missing!");
 
             const photoUrlInput = document.getElementById('familyHeroPhotoUrl').value.trim();
-
-            // Always clone existing array properly to avoid reference loss
             const currentMembers = JSON.parse(JSON.stringify(tempFamily.members));
 
             const familyObject = {
@@ -1122,7 +1150,6 @@
                 members: currentMembers
             };
 
-            // Fully replace existing memory key with updated family object
             masterDatabaseFile['church_family_' + serialNo] = familyObject;
 
             try {
@@ -1136,11 +1163,11 @@
                         mode: 'no-cors',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify(familyObject)
-                    }).then(() => console.log("Cloud Backup Auto-Synced Successfully!"))
+                    }).then(() => console.log("Cloud Backup Updated & Synced!"))
                     .catch(err => console.error("Cloud Sync Error:", err));
                 }
 
-                alert(`🎉 Success! Family Card #${serialNo} updated perfectly! New members are saved to Cloud!`);
+                alert(`🎉 Success! Family Card #${serialNo} is updated with all members and saved permanently!`);
                 resetForm();
             } catch(e) {
                 alert("⚠️ Storage Full: Please use smaller image files.");
@@ -1286,7 +1313,6 @@
             if(matches === 0) displayDiv.innerHTML = `<p style="color:red; font-size:0.8rem; margin-top:5px;">தகவல்கள் எதுவும் கிடைக்கவில்லை (No matching records found).</p>`;
         }
 
-        // DEEP COPY LOAD FUNCTION TO PRESERVE EXISTING MEMBERS
         function loadFamilyIntoWorkspace(key) {
             const family = masterDatabaseFile[key];
             document.getElementById('fNo').value = family.fNo;
@@ -1310,7 +1336,6 @@
                 try { mList = JSON.parse(family.members); } catch(e){}
             }
 
-            // Correctly set temp array so existing members are kept when adding new ones
             tempFamily.members = mList;
             renderMembersList();
             generateVisualDisplayBox(family, 'activeCardDisplayZone', key);
